@@ -161,6 +161,36 @@
         </div>
     </div>
 
+    <div id="userModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border border-slate-800 bg-slate-950 shadow-2xl">
+            <h2 class="text-white text-lg font-black mb-4">Who is playing?</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="selectUser('Nunu')" class="p-3 bg-slate-900 rounded-xl text-white font-bold hover:bg-blue-600 transition">Nunu</button>
+                <button onclick="selectUser('Charlie')" class="p-3 bg-slate-900 rounded-xl text-white font-bold hover:bg-blue-600 transition">Charlie</button>
+                <button onclick="selectUser('Paddy')" class="p-3 bg-slate-900 rounded-xl text-white font-bold hover:bg-blue-600 transition">Paddy</button>
+                <button onclick="selectUser('Lore')" class="p-3 bg-slate-900 rounded-xl text-white font-bold hover:bg-blue-600 transition">Lore</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-2 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+        <select id="groupFilter" onchange="renderGroupMatches()" 
+                class="bg-slate-950 text-white border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:border-blue-500 outline-none">
+            <option value="All">All Groups</option>
+            <option value="Group A">Group A</option>
+            <option value="Group B">Group B</option>
+            </select>
+        
+        <input type="date" id="dateFilter" 
+               class="bg-slate-950 text-white border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:border-blue-500 outline-none w-32" 
+               onchange="renderGroupMatches()">
+               
+        <button onclick="clearFilters()" 
+                class="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg px-3 py-2 text-xs font-black transition">
+            ×
+        </button>
+    </div>
+
     <script>
         // 🌟 PASTE YOUR UPDATED DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
@@ -188,6 +218,33 @@
             return `<img src="https://flagcdn.com/w40/${code}.png" class="inline-block w-5 h-4 object-cover rounded shadow-sm" alt="${teamName}">`;
         }
 
+        function checkUserSelection() {
+            const savedUser = localStorage.getItem('tournamentUser');
+            if (!savedUser) {
+                // No user found, force the modal
+                document.getElementById('userModal').classList.remove('hidden');
+            } else {
+                // User found, load them
+                appState.currentParticipant = savedUser;
+                // Sync the UI dropdown if it exists
+                const dropdown = document.getElementById('userSelect');
+                if (dropdown) dropdown.value = savedUser;
+                renderAllViews();
+            }
+        }
+        
+        function selectUser(name) {
+            localStorage.setItem('tournamentUser', name);
+            appState.currentParticipant = name;
+            
+            // Sync the dropdown
+            const dropdown = document.getElementById('userSelect');
+            if (dropdown) dropdown.value = name;
+            
+            document.getElementById('userModal').classList.add('hidden');
+            renderAllViews();
+        }
+
         let appState = { matches: [], currentParticipant: "Nunu" };
         let activeMatchId = null;
 
@@ -208,7 +265,8 @@
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('dateFilter').value = "";
                 document.getElementById('groupFilter').value = "All";
-    
+
+                checkUserSelection();
                 renderAllViews(true);
                 switchTab('leaderboard');
             } catch (err) {
