@@ -265,7 +265,12 @@
                 document.getElementById('loading').classList.add('hidden');
                 
                 // Set default date to today
-                const today = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const today = `${y}-${m}-${d}`;
+                
                 document.getElementById('dateFilter').value = "";
                 document.getElementById('groupFilter').value = "All";
 
@@ -356,7 +361,10 @@
 
                 if (!localTime) return false;
                 
-                const matchDateString = localTime.toISOString().split('T')[0];
+                const y = localTime.getFullYear();
+                const m = String(localTime.getMonth() + 1).padStart(2, '0');
+                const d = String(localTime.getDate()).padStart(2, '0');
+                const matchDateString = `${y}-${m}-${d}`;
                 
                 const matchesDate = (dateFilter === "" || matchDateString === dateFilter);
                 const matchesGroup = (groupFilter === "All" || m["Stage"] === groupFilter);
