@@ -86,16 +86,32 @@
         </section>
 
         <section id="view-group-matches" class="hidden space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-xl">
-                <h3 class="font-black uppercase tracking-wider text-sm text-slate-300">Group Stage Matches</h3>
-                <div class="flex items-center gap-3 text-xs">
-                    <label class="font-bold text-slate-500 uppercase tracking-wider">Timeline Filter:</label>
-                    <input type="date" id="dateFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg outline-none font-bold focus:border-blue-500">
+            <!-- Filter Controls -->
+            <div class="glass-panel p-4 rounded-xl space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <h3 class="font-black uppercase tracking-wider text-sm text-slate-300">Group Stage Matches</h3>
+                    <button onclick="clearFilters()" class="text-[10px] font-bold text-slate-500 hover:text-red-400 uppercase tracking-widest transition">Clear Filters</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Group Filter -->
+                    <select id="groupFilter" onchange="renderGroupMatches()" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold outline-none focus:border-blue-500">
+                        <option value="All">All Groups</option>
+                        <option value="Group A">Group A</option><option value="Group B">Group B</option>
+                        <option value="Group C">Group C</option><option value="Group D">Group D</option>
+                        <option value="Group E">Group E</option><option value="Group F">Group F</option>
+                        <option value="Group G">Group G</option><option value="Group H">Group H</option>
+                        <option value="Group I">Group I</option><option value="Group J">Group J</option>
+                        <option value="Group K">Group K</option><option value="Group L">Group L</option>
+                    </select>
+        
+                    <!-- Date Filter -->
+                    <input type="date" id="dateFilter" onchange="renderGroupMatches()" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold outline-none focus:border-blue-500">
                 </div>
             </div>
-
-            <div id="matchesContainer" class="space-y-3">
-                </div>
+        
+            <!-- Match List -->
+            <div id="matchesContainer" class="space-y-3"></div>
         </section>
 
         <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -146,7 +162,6 @@
     </div>
 
     <script>
-
         // 🌟 PASTE YOUR UPDATED DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
 
@@ -170,131 +185,82 @@
         function getFlag(teamName) {
             const code = countryCodes[teamName];
             if (!code) return `<span class="text-xs">🏳️</span>`; // Fallback
-            // This loads the image from the service
             return `<img src="https://flagcdn.com/w40/${code}.png" class="inline-block w-5 h-4 object-cover rounded shadow-sm" alt="${teamName}">`;
         }
 
-
-
         let appState = { matches: [], currentParticipant: "Nunu" };
-
         let activeMatchId = null;
 
-
-
+        /*
         document.getElementById('userSelect').addEventListener('change', (e) => {
-
             appState.currentParticipant = e.target.value;
-
             renderAllViews();
-
         });
-
-
 
         document.getElementById('dateFilter').addEventListener('input', (e) => {
-
             renderGroupMatches(e.target.value);
-
         });
-
-
+        */
 
         async function init() {
-
             try {
-
-                if(WEB_APP_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
-
-                    document.getElementById('loading').innerHTML = "<p class='text-red-400 font-bold p-4 text-center text-xs uppercase tracking-widest border border-red-900/30 rounded-xl bg-red-950/20'>Configuration Warning:<br>You forgot to insert your Apps Script Web App URL in the code configuration index line 124!</p>";
-
-                    return;
-
-                }
-
                 const res = await fetch(WEB_APP_URL);
-
                 appState.matches = await res.json();
-
                 document.getElementById('loading').classList.add('hidden');
-
+                
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('dateFilter').value = today;
+                
+                // Set default group
+                document.getElementById('groupFilter').value = "All";
+                
                 switchTab('leaderboard');
-
             } catch (err) {
-
                 console.error(err);
-
-                document.getElementById('loading').textContent = "Database communication network error pipeline blocked.";
-
+                document.getElementById('loading').textContent = "Database communication network error.";
             }
-
         }
 
-
-
+        // --- FILTER LOGIC ---
+        function clearFilters() {
+            document.getElementById('groupFilter').value = "All";
+            document.getElementById('dateFilter').value = ""; // Clears the date
+            renderGroupMatches(); 
+        }
+        
         function switchTab(tabId) {
-
             ['leaderboard', 'group-matches', 'group-tables', 'knockout'].forEach(t => {
-
                 document.getElementById(`view-${t}`).classList.add('hidden');
-
                 document.getElementById(`tab-${t}`).classList.remove('active-tab');
-
             });
-
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
-
             document.getElementById(`tab-${tabId}`).classList.add('active-tab');
-
             renderAllViews();
-
         }
-
-
 
         function renderAllViews() {
-
             calculateLeaderboard();
-
             renderGroupMatches();
-
             renderGroupTables();
-
             renderKnockoutTree();
-
         }
-
-
 
         function computePoints(realH, realA, predH, predA) {
-
             if ([realH, realA, predH, predA].some(x => x === "" || x === null || x === undefined)) return 0;
-
             const rh = parseInt(realH), ra = parseInt(realA);
-
             const ph = parseInt(predH), pa = parseInt(predA);
-
             if (rh === ph && ra === pa) return 5;
-
             if (Math.sign(rh - ra) === Math.sign(ph - pa)) {
-
                 if ((rh - ra) === (ph - pa)) return 3;
-
                 return 2;
-
             }
-
             return 0;
-
         }
 
-
-
         function calculateLeaderboard() {
-            const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
-        
+            const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };        
             updateTournamentStats();
-                    
             appState.matches.forEach(m => {
                 scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
                 scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
@@ -318,68 +284,51 @@
             });
         }
 
-
-
         function renderGroupMatches(filterDate = "") {
-
             const container = document.getElementById('matchesContainer');
+            const dateFilter = document.getElementById('dateFilter').value;
+            const groupFilter = document.getElementById('groupFilter').value;
 
             container.innerHTML = "";
-
-            const groupMatches = appState.matches.filter(m => m["Stage"].startsWith("Group"));
-
             let upcomingTargetNode = null;
 
-
-
-            groupMatches.forEach(m => {
-
+            const filteredMatches = appState.matches.filter(m => {
+                const isGroupMatch = m["Stage"]?.startsWith("Group");
+                if (!isGroupMatch) return false;
+    
                 const localTime = new Date(m["Match Datetime (MTY)"]);
-
                 const matchDateString = localTime.toISOString().split('T')[0];
+                
+                const matchesDate = (dateFilter === "" || matchDateString === dateFilter);
+                const matchesGroup = (groupFilter === "All" || m["Stage"] === groupFilter);
+    
+                return matchesDate && matchesGroup;
+            });
+    
+            if (filteredMatches.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500 text-sm py-10 italic">No matches found for these filters.</p>`;
+                return;
+            }
 
-                if (filterDate && matchDateString !== filterDate) return;
-
-
-
+            filteredMatches.forEach(m => {
+                const localTime = new Date(m["Match Datetime (MTY)"]);
                 const isLocked = new Date() > localTime;
-
                 const pH = m[`${appState.currentParticipant} Home`] ?? "";
-
                 const pA = m[`${appState.currentParticipant} Away`] ?? "";
-
                 const rH = m["Real Score Home"] ?? "";
-
                 const rA = m["Real Score Away"] ?? "";
-
-
-
                 const tHome = m["Match"].split(' vs ')[0];
-
                 const tAway = m["Match"].split(' vs ')[1];
-
-
-
                 const rowId = `match-row-${m["ID"]}`;
-
+        
                 if (!isLocked && !upcomingTargetNode) upcomingTargetNode = rowId;
-
-
-
                 container.innerHTML += `
-
                     <div id="${rowId}" onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
-
                          class="glass-panel p-4 rounded-xl flex items-center justify-between gap-2 transition ${isLocked ? 'opacity-50 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
-
                         <div class="w-1/4 text-[10px] font-bold text-slate-500">
-
                             <div class="text-slate-400 text-xs font-black">${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-
                             <div>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})}</div>
-
                             <div class="text-[9px] text-indigo-400/80 uppercase font-black mt-0.5 tracking-tight">${m["Stage"]}</div>
-
                         </div>
 
                         <div class="w-2/4 flex items-center justify-center gap-1.5 text-xs font-black text-white">
@@ -391,51 +340,26 @@
                         </div>
 
                         <div class="w-1/4 text-right">
-
                             <span class="text-[9px] text-slate-500 block uppercase font-black tracking-widest">Prediction</span>
-
                             <span class="inline-block text-[11px] font-black px-2 py-0.5 rounded ${pH !== "" ? 'bg-blue-950/40 text-blue-400 border border-blue-900/50' : 'bg-slate-950 text-slate-600'}">
-
                                 ${pH !== "" ? `${pH} - ${pA}` : '🔒 Clear'}
-
                             </span>
-
                         </div>
-
                     </div>
-
                 `;
-
             });
-
-
-
-            if (!filterDate && upcomingTargetNode) {
-
+            if (upcomingTargetNode) {
                 setTimeout(() => { document.getElementById(upcomingTargetNode)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
-
             }
-
         }
 
-
-
         function renderGroupTables() {
-
             const container = document.getElementById('view-group-tables');
-
             container.innerHTML = "";
-
             const letters = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-
-
-
             letters.forEach(g => {
-
                 const groupLabel = `Group ${g}`;
-
                 const mList = appState.matches.filter(m => m["Stage"] === groupLabel);
-
                 const table = {};
 
 
@@ -771,6 +695,15 @@
             }
         }
         window.onload = init;
+
+        // Trigger on load
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Add event listeners for your dropdowns
+        document.getElementById('userSelect').addEventListener('change', (e) => {
+            appState.currentParticipant = e.target.value;
+            renderAllViews();
+        });
     </script>
 </body>
 </html> 
