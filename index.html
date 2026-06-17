@@ -378,7 +378,7 @@
             }
 
             filteredMatches.forEach(m => {
-                const localTime = parseUtcDate(matchObj["Match Datetime (UTC)"]);
+                const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
                 if (!localTime) return false;
 
                 const displayTime = localTime.toLocaleTimeString([], {
