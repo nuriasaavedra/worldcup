@@ -191,6 +191,13 @@
         let appState = { matches: [], currentParticipant: "Nunu" };
         let activeMatchId = null;
 
+        function parseMtyDate(dateString) {
+            // Add "T" and the "-05:00" offset to the string if they aren't there
+            // This tells JS: "This time is in Monterrey"
+            const mtyString = dateString.replace(" ", "T") + "-05:00"; 
+            return new Date(mtyString);
+        }
+
         async function init() {
             try {
                 const res = await fetch(WEB_APP_URL);
@@ -284,7 +291,7 @@
                 const isGroupMatch = m["Stage"]?.startsWith("Group");
                 if (!isGroupMatch) return false;
     
-                const localTime = new Date(m["Match Datetime (MTY)"]);
+                const localTime = parseMtyDate(m["Match Datetime (MTY)"]);
                 const matchDateString = localTime.toISOString().split('T')[0];
                 
                 const matchesDate = (dateFilter === "" || matchDateString === dateFilter);
@@ -482,7 +489,7 @@
             const countdownEl = document.getElementById('statCountdown');
             
             if (finalMatch && countdownEl) {
-                const finalDate = new Date(finalMatch["Match Datetime (MTY)"]);
+                const finalDate = parseMtyDate(finalMatch["Match Datetime (MTY)"]);
                 
                 function updateTimer() {
                     const now = new Date();
