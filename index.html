@@ -233,10 +233,21 @@
         let activeMatchId = null;
 
         function parseUtcDate(dateString) {
-            if (!dateString) return new Date();
-            // Simply add 'Z' to the end. JS will treat the string as UTC
-            // and automatically convert it to the user's local timezone.
-            return new Date(dateString.replace(" ", "T") + "Z");
+            // DEBUG: See what is actually coming from the spreadsheet
+            console.log("Raw Date Value:", dateString);
+        
+            if (!dateString) return null; 
+        
+            // Try to parse it
+            const d = new Date(dateString.replace(" ", "T") + "Z");
+            
+            // Check if it's actually a valid date
+            if (isNaN(d.getTime())) {
+                console.warn("Invalid Date Format detected:", dateString);
+                return null;
+            }
+            
+            return d;
         }
 
         async function init() {
