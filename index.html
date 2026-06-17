@@ -274,7 +274,7 @@
 
         function renderGroupMatches(filterDate = "") {
             const container = document.getElementById('matchesContainer');
-            const dateFilter = isInitial ? "" : document.getElementById('dateFilter').value;
+            const dateFilter = (filterDate === true) ? "" : document.getElementById('dateFilter').value;
             const groupFilter = document.getElementById('groupFilter').value;
 
             container.innerHTML = "";
