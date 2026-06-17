@@ -272,9 +272,9 @@
             });
         }
 
-        function renderGroupMatches(filterDate = "") {
+        function renderGroupMatches(arg) {
             const container = document.getElementById('matchesContainer');
-            const dateFilter = isInitial ? "" : document.getElementById('dateFilter').value;
+            const dateFilter = (typeof arg === 'string') ? arg : document.getElementById('dateFilter').value;
             const groupFilter = document.getElementById('groupFilter').value;
 
             container.innerHTML = "";
@@ -401,77 +401,39 @@
             const container = document.getElementById('knockoutContainer');
             container.innerHTML = "";
             const stages = ["Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Third Place Play-off", "Final"];
-
             stages.forEach(st => {
-
                 const legs = appState.matches.filter(m => m["Stage"] === st);
-
                 if(legs.length === 0) return;
-
-
-
                 let cardsHtml = "";
-
                 legs.forEach(m => {
-
                     const localTime = new Date(m["Match Datetime (MTY)"]);
-
                     const isLocked = new Date() > localTime;
-
                     const pH = m[`${appState.currentParticipant} Home`] ?? "";
-
                     const pA = m[`${appState.currentParticipant} Away`] ?? "";
-
                     const rH = m["Real Score Home"] ?? "";
-
                     const rA = m["Real Score Away"] ?? "";
-
-
-
                     const tHome = m["Match"].split(' vs ')[0];
-
                     const tAway = m["Match"].split(' vs ')[1];
 
-
-
                     cardsHtml += `
-
                         <div onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
-
                              class="glass-panel p-3.5 rounded-xl flex flex-col justify-between shadow-lg transition ${isLocked ? 'opacity-40 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
-
                             <div class="text-[9px] font-bold text-slate-500 flex justify-between tracking-tight uppercase border-b border-slate-900/40 pb-1 mb-2">
-
                                 <span class="text-blue-400 font-black">${m["ID"]}</span>
-
                                 <span>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})} ${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-
                             </div>
-
                             <div class="space-y-1.5 my-1">
-
                                 <div class="flex justify-between text-xs font-black text-slate-300">
-
                                     <span class="truncate pr-1">${getFlag(tHome)} ${tHome}</span>
-
                                     <span class="text-white">${rH !== "" ? rH : '-'}</span>
-
                                 </div>
-
                                 <div class="flex justify-between text-xs font-black text-slate-300">
-
                                     <span class="truncate pr-1">${getFlag(tAway)} ${tAway}</span>
-
                                     <span class="text-white">${rA !== "" ? rA : '-'}</span>
-
                                 </div>
-
                             </div>
-
                             <div class="border-t border-slate-900/40 mt-2 pt-1.5 flex justify-between text-[9px] items-center uppercase font-black tracking-widest">
-
                                 <span class="text-slate-500">Prediction:</span>
-
                                 <span class="text-blue-400 font-black bg-blue-950/30 px-1.5 py-0.5 rounded border border-blue-900/30">${pH !== "" ? `${pH} - ${pA}` : 'Empty'}</span>
                             </div>
                         </div>
@@ -583,8 +545,22 @@
 
         // Trigger on load
         document.addEventListener('DOMContentLoaded', init);
+
+        // --- EVENT LISTENERS ---
+
+        // 1. Handles the filtering logic when a date is selected
+        document.getElementById('dateFilter').addEventListener('input', (e) => {
+            renderGroupMatches(e.target.value);
+        });
         
-        // Add event listeners for your dropdowns
+        // 2. Forces the calendar popup to open when clicked
+        document.getElementById('dateFilter').addEventListener('click', function() {
+            if (this.showPicker) {
+                this.showPicker();
+            }
+        });
+        
+        // 3. User select change listener
         document.getElementById('userSelect').addEventListener('change', (e) => {
             appState.currentParticipant = e.target.value;
             renderAllViews();
