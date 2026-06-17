@@ -55,21 +55,22 @@
 
         <section id="view-leaderboard" class="hidden space-y-6 animate-fade-in">
             <div class="glass-panel p-6 rounded-2xl relative overflow-hidden bg-gradient-to-br from-slate-900/80 via-blue-950/20 to-slate-900/80 border border-blue-500/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-                <div class="relative z-10">
-                    <h2 class="text-xl font-black uppercase text-white tracking-wide">Live Standings</h2>
-                    <p class="text-slate-400 text-xs mt-1">Metrics: 5pts Exact Score Match | 3pts Outcome + GD Hit | 2pts Straight Match Winner</p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 mt-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
                         <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Progress</div>
                         <div id="statProgress" class="text-lg font-black text-blue-400">0%</div>
                     </div>
                     <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
                         <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">To Final</div>
-                        <div id="statCountdown" class="text-sm font-black text-emerald-400 mt-1">-</div>
+                        <div id="statCountdown" class="text-[11px] font-black text-emerald-400 mt-1">-</div>
                     </div>
                 </div>
+            
+                <div class="relative z-10 border-t border-slate-800 pt-6">
+                    <h2 class="text-xl font-black uppercase text-white tracking-wide">Live Standings</h2>
+                    <p class="text-slate-400 text-xs mt-1">Metrics: 5pts Exact Score Match | 3pts Outcome + GD Hit | 2pts Straight Match Winner</p>
+                </div>
+                
                 <div class="absolute -right-4 -bottom-10 opacity-5 font-black text-[12rem] pointer-events-none">#1</div>
             </div>
 
@@ -111,70 +112,38 @@
             <div class="bg-slate-950/60 px-4 py-3 border-b border-slate-800/80 flex justify-between items-center">
                 <span id="modalStage" class="text-[10px] font-black uppercase text-blue-400 bg-blue-950/50 px-2 py-0.5 rounded border border-blue-900/50 tracking-wider">Stage</span>
                 <button onclick="closeModal()" class="text-slate-500 hover:text-slate-300 font-bold text-xl cursor-pointer">&times;</button>
-
             </div>
 
             <div class="p-6 space-y-6 text-center">
-
                 <div class="flex flex-col items-center gap-1.5">
-
                     <div id="modalVenue" class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider">Venue Location</div>
-
                     <h4 class="font-black text-slate-400 text-[10px] uppercase tracking-widest">Update Match Prediction</h4>
-
                 </div>
-
-                
 
                 <div class="flex items-center justify-center gap-4">
-
                     <div class="w-5/12 text-center space-y-1">
-
                         <span id="modalHomeFlag" class="text-2xl block"></span>
-
                         <p id="modalTeamHome" class="font-black text-white text-sm tracking-wide line-clamp-2"></p>
-
                     </div>
-
                     <div class="flex items-center gap-1">
-
                         <input type="number" id="inputHome" min="0" placeholder="0" class="w-12 h-14 text-center text-2xl font-black bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
-
                         <span class="text-slate-700 font-black text-xl mx-0.5">:</span>
-
                         <input type="number" id="inputAway" min="0" placeholder="0" class="w-12 h-14 text-center text-2xl font-black bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
-
                     </div>
-
                     <div class="w-5/12 text-center space-y-1">
-
                         <span id="modalAwayFlag" class="text-2xl block"></span>
-
                         <p id="modalTeamAway" class="font-black text-white text-sm tracking-wide line-clamp-2"></p>
-
                     </div>
-
                 </div>
 
-                
-
                 <p id="modalTimeNotice" class="text-slate-500 text-[11px] font-medium tracking-wide">Time localization context mapping</p>
-
             </div>
-
             <div class="bg-slate-950/40 px-4 py-3 border-t border-slate-800/80 flex gap-3">
-
                 <button onclick="closeModal()" class="w-1/2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition text-xs uppercase tracking-wider cursor-pointer">Cancel</button>
-
                 <button id="btnSavePrediction" onclick="savePrediction()" class="w-1/2 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-indigo-500 shadow-md transition text-xs uppercase tracking-wider cursor-pointer">Save Score</button>
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <script>
 
@@ -746,25 +715,36 @@
             
             // 1. Progress
             const percent = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
-            document.getElementById('statProgress').textContent = `${percent}%`;
+            const progressEl = document.getElementById('statProgress');
+            if (progressEl) progressEl.textContent = `${percent}%`;
         
             // 2. Countdown
             const finalMatch = appState.matches.find(m => m["Stage"] === "Final");
             const countdownEl = document.getElementById('statCountdown');
             
-            if (finalMatch) {
+            if (finalMatch && countdownEl) {
                 const finalDate = new Date(finalMatch["Match Datetime (MTY)"]);
-                const now = new Date();
-                const diff = finalDate - now;
+                
+                function updateTimer() {
+                    const now = new Date();
+                    const diff = finalDate - now;
         
-                if (diff <= 0) {
-                    countdownEl.textContent = "Final Started!";
-                } else {
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    countdownEl.textContent = `${days}d ${hours}h left`;
+                    if (diff <= 0) {
+                        countdownEl.textContent = "Final Started!";
+                    } else {
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    }
                 }
-            } else {
+                
+                updateTimer(); // Run once immediately
+                if (!window.countdownInterval) {
+                    window.countdownInterval = setInterval(updateTimer, 1000); // Update every second
+                }
+            } else if (countdownEl) {
                 countdownEl.textContent = "TBD";
             }
         }
