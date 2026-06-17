@@ -59,6 +59,17 @@
                     <h2 class="text-xl font-black uppercase text-white tracking-wide">Live Standings</h2>
                     <p class="text-slate-400 text-xs mt-1">Metrics: 5pts Exact Score Match | 3pts Outcome + GD Hit | 2pts Straight Match Winner</p>
                 </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+                        <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Progress</div>
+                        <div id="statProgress" class="text-lg font-black text-blue-400">0%</div>
+                    </div>
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+                        <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">To Final</div>
+                        <div id="statCountdown" class="text-sm font-black text-emerald-400 mt-1">-</div>
+                    </div>
+                </div>
                 <div class="absolute -right-4 -bottom-10 opacity-5 font-black text-[12rem] pointer-events-none">#1</div>
             </div>
 
@@ -324,20 +335,15 @@
 
 
         function calculateLeaderboard() {
-
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
-
             appState.matches.forEach(m => {
-
                 scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
-
                 scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
-
                 scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"]);
-
                 scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"]);
-
-            });
+            }
+             updateTournamentStats();                       
+           );
 
 
 
@@ -747,6 +753,35 @@
 
             document.getElementById('predictionModal').classList.remove('hidden');
 
+        }
+
+        function updateTournamentStats() {
+            const totalMatches = appState.matches.length;
+            const completedMatches = appState.matches.filter(m => m["Real Score Home"] !== "" && m["Real Score Home"] !== null).length;
+            
+            // 1. Progress
+            const percent = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
+            document.getElementById('statProgress').textContent = `${percent}%`;
+        
+            // 2. Countdown
+            const finalMatch = appState.matches.find(m => m["Stage"] === "Final");
+            const countdownEl = document.getElementById('statCountdown');
+            
+            if (finalMatch) {
+                const finalDate = new Date(finalMatch["Match Datetime (MTY)"]);
+                const now = new Date();
+                const diff = finalDate - now;
+        
+                if (diff <= 0) {
+                    countdownEl.textContent = "Final Started!";
+                } else {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    countdownEl.textContent = `${days}d ${hours}h left`;
+                }
+            } else {
+                countdownEl.textContent = "TBD";
+            }
         }
 
 
