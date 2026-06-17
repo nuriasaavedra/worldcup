@@ -3,96 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Cup 2026 Quiniela</title>
-
-    <meta property="og:title" content="World Cup 2026 Quiniela">
-    <meta property="og:description" content="Predict scores, track standings live, and check the leaderboard.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+    <title>🏆 World Cup 2026 Quiniela</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <style>
-        .active-tab { border-bottom: 2px solid #3b82f6; color: white !important; }
-        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.03); }
+        .active-tab { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #60a5fa; font-weight: 800; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .glass-panel { background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
-<body class="bg-[#0b0f19] min-h-screen text-slate-300 font-sans pb-16 antialiased">
+<body class="bg-[#0b0f19] min-h-screen text-slate-200 font-sans pb-16 antialiased">
 
-    <nav class="sticky top-0 bg-[#0b0f19]/90 backdrop-blur-xl z-40 border-b border-white/5">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-sm font-black tracking-[0.2em] uppercase text-slate-100 flex items-center gap-2">
-                <span class="text-blue-500 text-lg">🏆</span> World Cup 2026
-            </h1>
-            
-            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-white/5">
-                <span class="text-[9px] font-bold text-slate-600 uppercase">Predictor</span>
-                <select id="userSelect" class="bg-transparent font-bold text-blue-400 text-xs outline-none cursor-pointer">
-                    <option value="Nunu">Nunu</option>
-                    <option value="Charlie">Charlie</option>
-                    <option value="Paddy">Paddy</option>
-                    <option value="Lore">Lore</option>
-                </select>
+    <nav class="sticky top-0 bg-[#0b0f19]/90 backdrop-blur-md z-40 border-b border-slate-800/80">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🏆</span>
+                <h1 class="text-sm font-black tracking-wider uppercase text-white">Quiniela 2026</h1>
             </div>
+            <select id="userSelect" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-black text-blue-400 outline-none cursor-pointer">
+                <option value="Nunu">Nunu</option>
+                <option value="Charlie">Charlie</option>
+                <option value="Paddy">Paddy</option>
+                <option value="Lore">Lore</option>
+            </select>
         </div>
 
-        <div class="max-w-5xl mx-auto px-4 flex gap-6 text-[10px] font-bold tracking-widest uppercase text-slate-500 overflow-x-auto">
-            <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="py-3 cursor-pointer hover:text-white transition-colors active-tab">Leaderboard</button>
-            <button onclick="switchTab('group-tables')" id="tab-group-tables" class="py-3 cursor-pointer hover:text-white transition-colors">Standings</button>
-            <button onclick="switchTab('group-matches')" id="tab-group-matches" class="py-3 cursor-pointer hover:text-white transition-colors">Matches</button>
-            <button onclick="switchTab('knockout')" id="tab-knockout" class="py-3 cursor-pointer hover:text-white transition-colors">Brackets</button>
+        <div class="max-w-5xl mx-auto px-4 overflow-x-auto flex text-[10px] font-bold tracking-widest uppercase text-slate-400">
+            <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="active-tab px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🏠 Leaderboard</button>
+            <button onclick="switchTab('group-matches')" id="tab-group-matches" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📅 Matches</button>
+            <button onclick="switchTab('group-tables')" id="tab-group-tables" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📊 Standings</button>
+            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🌳 Brackets</button>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 mt-8">
-        <div class="grid grid-cols-2 gap-3 mb-8">
-            <div class="glass-panel p-4 rounded-xl border border-blue-500/10">
-                <div id="stat-progress" class="text-2xl font-black text-white">0%</div>
-                <div class="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Completion</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl border border-indigo-500/10">
-                <div id="stat-countdown" class="text-2xl font-black text-white">0</div>
-                <div class="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Days to Final</div>
-            </div>
-        </div>
+        <div id="loading" class="text-center py-20 text-slate-500 font-black uppercase tracking-widest">Syncing Pipeline...</div>
 
-        <div id="loading" class="flex flex-col items-center justify-center py-20 text-slate-500">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-slate-800 border-t-blue-500"></div>
-        </div>
-
-        <section id="view-leaderboard" class="space-y-6">
-            <div id="leaderboardList" class="glass-panel rounded-2xl overflow-hidden"></div>
+        <section id="view-leaderboard" class="space-y-4">
+            <div id="leaderboardList" class="glass-panel rounded-2xl overflow-hidden divide-y divide-slate-800"></div>
         </section>
-
-        <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6"></section>
 
         <section id="view-group-matches" class="hidden space-y-4">
-            <input type="date" id="dateFilter" class="bg-slate-900 border border-slate-800 text-slate-200 px-4 py-2 rounded-lg text-xs font-bold w-full">
-            <div id="matchesContainer" class="space-y-3"></div>
+            <div class="flex flex-col md:flex-row gap-3 glass-panel p-4 rounded-xl">
+                <input type="date" id="dateFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold w-full outline-none">
+                <select id="stageFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold w-full outline-none">
+                    <option value="all">All Stages</option>
+                </select>
+            </div>
+            <div id="matchesContainer" class="space-y-2"></div>
         </section>
 
-        <section id="view-knockout" class="hidden space-y-8">
-            <div id="knockoutContainer" class="flex flex-col gap-8"></div>
-        </section>
+        <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4"></section>
+
+        <section id="view-knockout" class="hidden space-y-8"></section>
     </main>
 
-    <div id="predictionModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 hidden z-50">
-        <div class="glass-panel rounded-2xl max-w-sm w-full p-6 space-y-6">
-            <div class="flex justify-between items-center text-xs font-bold text-blue-400">
-                <span id="modalStage"></span>
-                <button onclick="closeModal()" class="text-slate-500">Close</button>
-            </div>
-            <div class="flex items-center justify-center gap-4">
-                <div class="w-1/3 text-center"><span id="modalHomeFlag" class="text-2xl"></span><div id="modalTeamHome" class="text-xs font-bold mt-1"></div></div>
-                <div class="flex gap-2">
-                    <input type="number" id="inputHome" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded text-center font-black">
-                    <input type="number" id="inputAway" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded text-center font-black">
+    <div id="predictionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl max-w-sm w-full p-6 border border-slate-800">
+            <h3 id="modalMatchInfo" class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 text-center"></h3>
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div class="text-center w-1/3 text-xs font-bold"><div id="homeFlag" class="text-2xl mb-1"></div><div id="homeName"></div></div>
+                <div class="flex gap-1">
+                    <input type="number" id="inputHome" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded-lg text-center text-xl font-black text-white">
+                    <input type="number" id="inputAway" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded-lg text-center text-xl font-black text-white">
                 </div>
-                <div class="w-1/3 text-center"><span id="modalAwayFlag" class="text-2xl"></span><div id="modalTeamAway" class="text-xs font-bold mt-1"></div></div>
+                <div class="text-center w-1/3 text-xs font-bold"><div id="awayFlag" class="text-2xl mb-1"></div><div id="awayName"></div></div>
             </div>
-            <button id="btnSavePrediction" onclick="savePrediction()" class="w-full py-3 bg-blue-600 rounded-xl font-bold text-sm">Save Prediction</button>
+            <div class="flex gap-2">
+                <button onclick="closeModal()" class="w-1/2 py-2 bg-slate-800 rounded-lg text-xs font-bold">Cancel</button>
+                <button id="btnSave" onclick="savePrediction()" class="w-1/2 py-2 bg-blue-600 rounded-lg text-xs font-bold">Save</button>
+            </div>
         </div>
     </div>
 
@@ -101,24 +82,27 @@
         
         const flags = { "Mexico": "🇲🇽", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czechia": "🇨🇿", "Canada": "🇨🇦", "Bosnia and Herzegovina": "🇧🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭", "Brazil": "🇧🇷", "Morocco": "🇲🇦", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Haiti": "🇭🇹", "USA": "🇺🇸", "Paraguay": "🇵🇾", "Australia": "🇦🇺", "Türkiye": "🇹🇷", "Germany": "🇩🇪", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨", "Netherlands": "🇳🇱", "Japan": "🇯🇵", "Sweden": "🇸🇪", "Tunisia": "🇹🇳", "Belgium": "🇧🇪", "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿", "Spain": "🇪🇸", "Cape Verde": "🇨🇻", "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾", "France": "🇫🇷", "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴", "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴", "Portugal": "🇵🇹", "Congo DR": "🇨🇩", "Uzbekistan": "🇺🇿", "Colombia": "🇨🇴", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦" };
 
-        let appState = { matches: [], currentParticipant: "Nunu" };
-        let activeMatchId = null;
+        let appState = { matches: [], currentParticipant: "Nunu", filters: { date: "", stage: "all" } };
+        let activeMatch = null;
 
         async function init() {
             try {
                 const res = await fetch(WEB_APP_URL);
                 appState.matches = await res.json();
                 document.getElementById('loading').classList.add('hidden');
-                updateLeadership();
-                renderAllViews();
+                populateFilters();
+                renderAll();
             } catch(e) { console.error(e); }
         }
 
-        function updateLeadership() {
-            const played = appState.matches.filter(m => m["Real Score Home"] !== "").length;
-            document.getElementById('stat-progress').textContent = `${Math.round((played / 104) * 100)}%`;
-            const diff = Math.ceil((new Date('2026-07-26') - new Date()) / 86400000);
-            document.getElementById('stat-countdown').textContent = diff > 0 ? diff : 0;
+        function populateFilters() {
+            const stages = [...new Set(appState.matches.map(m => m.Stage))];
+            const select = document.getElementById('stageFilter');
+            stages.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.textContent = s;
+                select.appendChild(opt);
+            });
         }
 
         function switchTab(tabId) {
@@ -128,14 +112,14 @@
             });
         }
 
-        function renderAllViews() {
-            calculateLeaderboard();
-            renderGroupMatches();
-            renderGroupTables();
-            renderKnockoutTree();
+        function renderAll() {
+            renderLeaderboard();
+            renderMatches();
+            renderTables();
+            renderBrackets();
         }
 
-        function calculateLeaderboard() {
+        function renderLeaderboard() {
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
             appState.matches.forEach(m => {
                 const h = m["Real Score Home"], a = m["Real Score Away"];
@@ -146,59 +130,114 @@
                     else if(Math.sign(h-a) == Math.sign(ph-pa)) scores[p] += (h-a == ph-pa) ? 3 : 2;
                 });
             });
-            const html = Object.entries(scores).sort((a,b) => b[1]-a[1]).map(([n, s], i) => `
-                <div class="grid grid-cols-12 p-4 border-b border-white/5 items-center">
-                    <div class="col-span-2 text-center text-sm font-bold text-slate-500">${i+1}</div>
-                    <div class="col-span-6 font-bold ${n === appState.currentParticipant ? 'text-blue-400': 'text-slate-300'}">${n}</div>
-                    <div class="col-span-4 text-right pr-4 font-black">${s} pts</div>
+            document.getElementById('leaderboardList').innerHTML = Object.entries(scores).sort((a,b) => b[1]-a[1]).map(([n, s]) => `
+                <div class="grid grid-cols-12 p-4 items-center">
+                    <div class="col-span-8 font-bold ${n === appState.currentParticipant ? 'text-blue-400' : 'text-slate-300'}">${n}</div>
+                    <div class="col-span-4 text-right font-black">${s} pts</div>
                 </div>`).join('');
-            document.getElementById('leaderboardList').innerHTML = html;
         }
 
-        function renderGroupMatches(filterDate = "") {
+        function renderMatches() {
             const container = document.getElementById('matchesContainer');
-            container.innerHTML = appState.matches.filter(m => m.Stage.startsWith("Group")).map(m => `
-                <div onclick="openModal('${m.ID}')" class="glass-panel p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-blue-500/30">
-                    <div class="text-[10px] font-bold text-slate-500">${m.Stage}</div>
-                    <div class="text-xs font-bold">${m.Match.split(' vs ')[0]} ${flags[m.Match.split(' vs ')[0]]} vs ${flags[m.Match.split(' vs ')[1]]} ${m.Match.split(' vs ')[1]}</div>
-                    <div class="text-blue-400 font-black">${m["Real Score Home"] !== "" ? m["Real Score Home"] + "-" + m["Real Score Away"] : 'VS'}</div>
-                </div>`).join('');
+            const dateFilter = document.getElementById('dateFilter').value;
+            const stageFilter = document.getElementById('stageFilter').value;
+
+            container.innerHTML = appState.matches.filter(m => {
+                const dMatch = new Date(m["Match Datetime (MTY)"]).toISOString().split('T')[0];
+                const dMatchCheck = dateFilter ? dMatch === dateFilter : true;
+                const sMatchCheck = stageFilter !== "all" ? m.Stage === stageFilter : true;
+                return dMatchCheck && sMatchCheck;
+            }).map(m => {
+                const isLocked = new Date() > new Date(m["Match Datetime (MTY)"]);
+                const pH = m[appState.currentParticipant + " Home"];
+                const pA = m[appState.currentParticipant + " Away"];
+                return `
+                    <div onclick="${isLocked ? '' : `openModal('${m.ID}')`}" class="glass-panel p-4 rounded-xl flex justify-between items-center ${isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-800'}">
+                        <div class="text-[10px] font-bold text-slate-500 w-1/4">${m.Stage}</div>
+                        <div class="text-xs font-bold w-2/4 text-center truncate">${m.Match}</div>
+                        <div class="text-blue-400 font-black text-right w-1/4">${pH !== null && pH !== "" ? `${pH}-${pA}` : (isLocked ? 'Locked' : 'Bet')}</div>
+                    </div>`;
+            }).join('');
         }
 
-        function renderGroupTables() {
+        function renderTables() {
             const container = document.getElementById('view-group-tables');
-            container.innerHTML = ['A','B','C','D','E','F','G','H'].map(g => `
-                <div class="glass-panel p-4 rounded-xl">
-                    <div class="font-black text-xs uppercase text-slate-500 mb-4">Group ${g}</div>
-                    <div id="table-group-${g}">...</div>
-                </div>`).join('');
+            container.innerHTML = "";
+            const stages = [...new Set(appState.matches.map(m => m.Stage))].filter(s => s.includes("Group"));
+            stages.forEach(st => {
+                const teams = {};
+                appState.matches.filter(m => m.Stage === st).forEach(m => {
+                    const [t1, t2] = m.Match.split(' vs ');
+                    [t1, t2].forEach(t => { if(!teams[t]) teams[t] = {p:0, gd:0}; });
+                    const rh = parseInt(m["Real Score Home"]), ra = parseInt(m["Real Score Away"]);
+                    if(!isNaN(rh)) {
+                        teams[t1].gd += (rh-ra); teams[t2].gd += (ra-rh);
+                        if(rh > ra) teams[t1].p += 3; else if(ra > rh) teams[t2].p += 3; else {teams[t1].p++; teams[t2].p++;}
+                    }
+                });
+                container.innerHTML += `
+                    <div class="glass-panel p-4 rounded-xl">
+                        <h4 class="font-black text-xs text-slate-500 mb-2">${st}</h4>
+                        ${Object.entries(teams).sort((a,b) => b[1].p - a[1].p).map(([n, d]) => `
+                            <div class="flex justify-between text-xs py-1 border-b border-slate-800">
+                                <span>${flags[n] || "🏳️"} ${n}</span><span class="font-bold">${d.p} pts</span>
+                            </div>`).join('')}
+                    </div>`;
+            });
         }
 
-        function renderKnockoutTree() {} // Logic remains as per your previous implementation
+        function renderBrackets() {
+            const container = document.getElementById('view-knockout');
+            container.innerHTML = "";
+            const stages = [...new Set(appState.matches.map(m => m.Stage))].filter(s => !s.includes("Group"));
+            stages.forEach(st => {
+                container.innerHTML += `<div><h4 class="font-black text-xs text-slate-500 mb-2">${st}</h4><div class="grid grid-cols-2 gap-2">
+                    ${appState.matches.filter(m => m.Stage === st).map(m => `
+                        <div class="glass-panel p-2 rounded text-[10px] font-bold text-center">${m.Match}</div>`).join('')}
+                </div></div>`;
+            });
+        }
 
         function openModal(id) {
-            activeMatchId = id;
-            const m = appState.matches.find(x => x.ID === id);
-            document.getElementById('modalStage').textContent = m.Stage;
-            document.getElementById('modalTeamHome').textContent = m.Match.split(' vs ')[0];
-            document.getElementById('modalTeamAway').textContent = m.Match.split(' vs ')[1];
+            activeMatch = appState.matches.find(m => m.ID === id);
+            const [h, a] = activeMatch.Match.split(' vs ');
+            document.getElementById('modalMatchInfo').textContent = `${activeMatch.Stage} | ${h} vs ${a}`;
+            document.getElementById('homeName').textContent = h;
+            document.getElementById('awayName').textContent = a;
+            document.getElementById('homeFlag').textContent = flags[h] || "🏳️";
+            document.getElementById('awayFlag').textContent = flags[a] || "🏳️";
+            document.getElementById('inputHome').value = activeMatch[appState.currentParticipant + " Home"] || "";
+            document.getElementById('inputAway').value = activeMatch[appState.currentParticipant + " Away"] || "";
             document.getElementById('predictionModal').classList.remove('hidden');
         }
 
         function closeModal() { document.getElementById('predictionModal').classList.add('hidden'); }
 
         async function savePrediction() {
-            const home = document.getElementById('inputHome').value;
-            const away = document.getElementById('inputAway').value;
-            // ... (Your existing fetch implementation here)
-            closeModal();
-            alert("Prediction Saved!");
+            const h = document.getElementById('inputHome').value;
+            const a = document.getElementById('inputAway').value;
+            const btn = document.getElementById('btnSave');
+            btn.disabled = true; btn.textContent = "Saving...";
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matchId: activeMatch.ID, participant: appState.currentParticipant, homeScore: parseInt(h), awayScore: parseInt(a) })
+                });
+                
+                const idx = appState.matches.findIndex(m => m.ID === activeMatch.ID);
+                appState.matches[idx][appState.currentParticipant + " Home"] = h;
+                appState.matches[idx][appState.currentParticipant + " Away"] = a;
+                
+                closeModal();
+                renderAll();
+            } catch(e) { alert("Save failed"); } finally { btn.disabled = false; btn.textContent = "Save"; }
         }
 
-        document.getElementById('userSelect').addEventListener('change', (e) => {
-            appState.currentParticipant = e.target.value;
-            renderAllViews();
-        });
+        document.getElementById('userSelect').addEventListener('change', (e) => { appState.currentParticipant = e.target.value; renderAll(); });
+        document.getElementById('dateFilter').addEventListener('change', renderMatches);
+        document.getElementById('stageFilter').addEventListener('change', renderMatches);
 
         window.onload = init;
     </script>
