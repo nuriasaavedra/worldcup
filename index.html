@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 World Cup 2026 Quiniela</title>
+    <title>World Cup 2026 Quiniela</title>
 
-    <meta property="og:title" content="🏆 World Cup 2026 Friends Quiniela">
+    <meta property="og:title" content="World Cup 2026 Quiniela">
     <meta property="og:description" content="Predict scores, track standings live, and check the leaderboard. See who dominates the tournament!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=500">
     <meta property="og:type" content="website">
@@ -336,45 +336,30 @@
 
         function calculateLeaderboard() {
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
+        
+            updateTournamentStats();
+                    
             appState.matches.forEach(m => {
                 scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
                 scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
                 scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"]);
                 scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"]);
-            }
-             updateTournamentStats();                       
-           );
-
-
-
-            const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-
-            const container = document.getElementById('leaderboardList');
-
-            container.innerHTML = "";
-
-
-
-            sorted.forEach(([name, score], idx) => {
-
-                const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "⚡";
-
-                container.innerHTML += `
-
-                    <div class="grid grid-cols-12 p-4 items-center hover:bg-slate-900/30 transition border-b border-slate-900/40">
-
-                        <div class="col-span-2 text-center font-bold text-slate-500 text-sm">${medal}</div>
-
-                        <div class="col-span-6 font-bold text-slate-300 ${name === appState.currentParticipant ? 'text-blue-400 font-black' : ''}">${name}</div>
-
-                        <div class="col-span-4 text-right pr-4 font-black text-white text-base">${score} <span class="text-xs text-slate-500 font-normal">pts</span></div>
-
-                    </div>
-
-                `;
-
             });
-
+        
+            const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = "";
+        
+            sorted.forEach(([name, score], idx) => {
+                const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "⚡";
+                container.innerHTML += `
+                    <div class="grid grid-cols-12 p-4 items-center hover:bg-slate-900/30 transition border-b border-slate-900/40">
+                        <div class="col-span-2 text-center font-bold text-slate-500 text-sm">${medal}</div>
+                        <div class="col-span-6 font-bold text-slate-300 ${name === appState.currentParticipant ? 'text-blue-400 font-black' : ''}">${name}</div>
+                        <div class="col-span-4 text-right pr-4 font-black text-white text-base">${score} <span class="text-xs text-slate-500 font-normal">pts</span></div>
+                    </div>
+                `;
+            });
         }
 
 
