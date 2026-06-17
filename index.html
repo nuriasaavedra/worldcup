@@ -501,7 +501,7 @@
         function openModal(matchId) {
             activeMatchId = matchId;
             const match = appState.matches.find(m => m["ID"] === matchId);
-            const localTime = parseUtcDate(m["Match Datetime (MTY)"]);
+            const localTime = parseUtcDate(match["Match Datetime (MTY)"]);
             const tHome = match["Match"].split(' vs ')[0];
             const tAway = match["Match"].split(' vs ')[1];
 
