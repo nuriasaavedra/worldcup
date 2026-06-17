@@ -173,24 +173,6 @@
         </div>
     </div>
 
-    <div class="flex gap-2 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
-        <select id="groupFilter" onchange="renderGroupMatches()" 
-                class="bg-slate-950 text-white border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:border-blue-500 outline-none">
-            <option value="All">All Groups</option>
-            <option value="Group A">Group A</option>
-            <option value="Group B">Group B</option>
-            </select>
-        
-        <input type="date" id="dateFilter" 
-               class="bg-slate-950 text-white border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:border-blue-500 outline-none w-32" 
-               onchange="renderGroupMatches()">
-               
-        <button onclick="clearFilters()" 
-                class="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg px-3 py-2 text-xs font-black transition">
-            ×
-        </button>
-    </div>
-
     <script>
         // 🌟 PASTE YOUR UPDATED DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
@@ -230,6 +212,7 @@
                 const dropdown = document.getElementById('userSelect');
                 if (dropdown) dropdown.value = savedUser;
                 renderAllViews();
+                switchTab('leaderboard');
             }
         }
         
@@ -243,16 +226,20 @@
             
             document.getElementById('userModal').classList.add('hidden');
             renderAllViews();
+            switchTab('leaderboard');
         }
 
         let appState = { matches: [], currentParticipant: "Nunu" };
         let activeMatchId = null;
 
         function parseMtyDate(dateString) {
-            // Add "T" and the "-05:00" offset to the string if they aren't there
-            // This tells JS: "This time is in Monterrey"
-            const mtyString = dateString.replace(" ", "T") + "-05:00"; 
-            return new Date(mtyString);
+            if (!dateString) return new Date();
+            // Ensures format is YYYY-MM-DDTHH:MM:SS
+            const formatted = dateString.replace(" ", "T"); 
+            const date = new Date(formatted + "-05:00");
+            
+            // Safety check: If it's invalid, return a date far in the future to avoid NaN
+            return isNaN(date.getTime()) ? new Date("2099-01-01") : date;
         }
 
         async function init() {
@@ -267,8 +254,8 @@
                 document.getElementById('groupFilter').value = "All";
 
                 checkUserSelection();
-                renderAllViews(true);
-                switchTab('leaderboard');
+                /*renderAllViews(true);
+                switchTab('leaderboard');*/
             } catch (err) {
                 console.error(err);
                 document.getElementById('loading').textContent = "Database communication error.";
@@ -364,7 +351,7 @@
             }
 
             filteredMatches.forEach(m => {
-                const localTime = new Date(m["Match Datetime (MTY)"]);
+                const localTime = parseMtyDate(m["Match Datetime (MTY)"]);
                 const isLocked = new Date() > localTime;
                 const pH = m[`${appState.currentParticipant} Home`] ?? "";
                 const pA = m[`${appState.currentParticipant} Away`] ?? "";
@@ -471,7 +458,7 @@
                 if(legs.length === 0) return;
                 let cardsHtml = "";
                 legs.forEach(m => {
-                    const localTime = new Date(m["Match Datetime (MTY)"]);
+                    const localTime = parseMtyDate(m["Match Datetime (MTY)"]);
                     const isLocked = new Date() > localTime;
                     const pH = m[`${appState.currentParticipant} Home`] ?? "";
                     const pA = m[`${appState.currentParticipant} Away`] ?? "";
@@ -517,7 +504,7 @@
         function openModal(matchId) {
             activeMatchId = matchId;
             const match = appState.matches.find(m => m["ID"] === matchId);
-            const localTime = new Date(match["Match Datetime (MTY)"]);
+            const localTime = parseMtyDate(m["Match Datetime (MTY)"]);
             const tHome = match["Match"].split(' vs ')[0];
             const tAway = match["Match"].split(' vs ')[1];
 
