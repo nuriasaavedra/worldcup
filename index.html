@@ -380,7 +380,9 @@
             filteredMatches.forEach(m => {
                 const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
                 if (!localTime) return false;
-                const isLocked = new Date() > localTime;
+                // Add this line
+                console.log("Input String:", m["Match Datetime (UTC)"], "Resulting Date Object:", localTime.toISOString());
+                const isLocked = false; //new Date() > localTime;
                 const pH = m[`${appState.currentParticipant} Home`] ?? "";
                 const pA = m[`${appState.currentParticipant} Away`] ?? "";
                 const rH = m["Real Score Home"] ?? "";
@@ -488,7 +490,7 @@
                 legs.forEach(m => {
                     const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
                     if (!localTime) return false;
-                    const isLocked = new Date() > localTime;
+                    const isLocked = false; //new Date() > localTime;
                     const pH = m[`${appState.currentParticipant} Home`] ?? "";
                     const pA = m[`${appState.currentParticipant} Away`] ?? "";
                     const rH = m["Real Score Home"] ?? "";
@@ -614,8 +616,18 @@
                 const idx = appState.matches.findIndex(m => m["ID"] === activeMatchId);
                 appState.matches[idx][`${appState.currentParticipant} Home`] = payload.homeScore;
                 appState.matches[idx][`${appState.currentParticipant} Away`] = payload.awayScore;
+
+                const editedMatchId = activeMatchId;
+                
                 closeModal();
                 renderAllViews();
+
+                setTimeout(() => {
+                const element = document.getElementById(`match-row-${editedMatchId}`);
+                if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
             } catch (err) {
                 console.error(err);
                 alert("Data communication failed.");
