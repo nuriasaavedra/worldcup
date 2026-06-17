@@ -235,10 +235,10 @@
         function parseUtcDate(dateString) {
             if (!dateString) return null;
             
-            // Simply try to create the date.
-            const d = new Date(dateString);
+            const cleanDate = dateString.endsWith('Z') ? dateString : dateString + 'Z';
+    
+            const d = new Date(cleanDate);
             
-            // If it's invalid, return null so the app doesn't crash
             if (isNaN(d.getTime())) {
                 console.warn("Could not parse date:", dateString);
                 return null;
@@ -522,8 +522,8 @@
             document.getElementById('modalVenue').textContent = match["Stadium / City"] || "TBD Stadium Venue";
             document.getElementById('modalTeamHome').textContent = tHome;
             document.getElementById('modalTeamAway').textContent = tAway;
-            document.getElementById('modalHomeFlag').textContent = getFlag(tHome);
-            document.getElementById('modalAwayFlag').textContent = getFlag(tAway);
+            document.getElementById('modalHomeFlag').innerHTML = getFlag(tHome);
+            document.getElementById('modalAwayFlag').innerHTML = getFlag(tAway);
             document.getElementById('modalTimeNotice').textContent = `Kickoff: ${localTime.toLocaleString([], {weekday: 'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName: 'short'})}`;
             document.getElementById('inputHome').value = match[`${appState.currentParticipant} Home`] ?? "";
             document.getElementById('inputAway').value = match[`${appState.currentParticipant} Away`] ?? "";
