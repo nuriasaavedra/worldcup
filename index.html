@@ -375,7 +375,7 @@
                     <div id="${rowId}" onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
                          class="glass-panel p-4 rounded-xl flex items-center justify-between gap-2 transition ${isLocked ? 'opacity-50 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
                         <div class="w-1/4 text-[10px] font-bold text-slate-500">
-                            <div class="text-slate-400 text-xs font-black">${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                            <div class="text-slate-400 text-xs font-black">${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', timeZoneName: 'short'})}</div>
                             <div>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})}</div>
                             <div class="text-[9px] text-indigo-400/80 uppercase font-black mt-0.5 tracking-tight">${m["Stage"]}</div>
                         </div>
@@ -482,7 +482,7 @@
                              class="glass-panel p-3.5 rounded-xl flex flex-col justify-between shadow-lg transition ${isLocked ? 'opacity-40 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
                             <div class="text-[9px] font-bold text-slate-500 flex justify-between tracking-tight uppercase border-b border-slate-900/40 pb-1 mb-2">
                                 <span class="text-blue-400 font-black">${m["ID"]}</span>
-                                <span>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})} ${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                                <span>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})} ${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', timeZoneName: 'short'})}</span>
                             </div>
                             <div class="space-y-1.5 my-1">
                                 <div class="flex justify-between text-xs font-black text-slate-300">
@@ -524,7 +524,7 @@
             document.getElementById('modalTeamAway').textContent = tAway;
             document.getElementById('modalHomeFlag').textContent = getFlag(tHome);
             document.getElementById('modalAwayFlag').textContent = getFlag(tAway);
-            document.getElementById('modalTimeNotice').textContent = `Kickoff: ${localTime.toLocaleString([], {weekday: 'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
+            document.getElementById('modalTimeNotice').textContent = `Kickoff: ${localTime.toLocaleString([], {weekday: 'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName: 'short'})}`;
             document.getElementById('inputHome').value = match[`${appState.currentParticipant} Home`] ?? "";
             document.getElementById('inputAway').value = match[`${appState.currentParticipant} Away`] ?? "";
             document.getElementById('predictionModal').classList.remove('hidden');
