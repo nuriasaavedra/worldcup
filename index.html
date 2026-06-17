@@ -233,17 +233,14 @@
         let activeMatchId = null;
 
         function parseUtcDate(dateString) {
-            // DEBUG: See what is actually coming from the spreadsheet
-            console.log("Raw Date Value:", dateString);
-        
-            if (!dateString) return null; 
-        
-            // Try to parse it
-            const d = new Date(dateString.replace(" ", "T") + "Z");
+            if (!dateString) return null;
             
-            // Check if it's actually a valid date
+            // Simply try to create the date.
+            const d = new Date(dateString);
+            
+            // If it's invalid, return null so the app doesn't crash
             if (isNaN(d.getTime())) {
-                console.warn("Invalid Date Format detected:", dateString);
+                console.warn("Could not parse date:", dateString);
                 return null;
             }
             
