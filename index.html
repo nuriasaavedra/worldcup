@@ -342,6 +342,9 @@
                 if (!isGroupMatch) return false;
     
                 const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
+
+                if (!localTime) return false;
+                
                 const matchDateString = localTime.toISOString().split('T')[0];
                 
                 const matchesDate = (dateFilter === "" || matchDateString === dateFilter);
@@ -357,6 +360,7 @@
 
             filteredMatches.forEach(m => {
                 const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
+                if (!localTime) return false;
                 const isLocked = new Date() > localTime;
                 const pH = m[`${appState.currentParticipant} Home`] ?? "";
                 const pA = m[`${appState.currentParticipant} Away`] ?? "";
@@ -464,6 +468,7 @@
                 let cardsHtml = "";
                 legs.forEach(m => {
                     const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
+                    if (!localTime) return false;
                     const isLocked = new Date() > localTime;
                     const pH = m[`${appState.currentParticipant} Home`] ?? "";
                     const pA = m[`${appState.currentParticipant} Away`] ?? "";
