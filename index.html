@@ -378,8 +378,15 @@
             }
 
             filteredMatches.forEach(m => {
-                const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
+                const localTime = parseUtcDate(matchObj["Match Datetime (UTC)"]);
                 if (!localTime) return false;
+
+                const displayTime = localTime.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false 
+                });
+                
                 // Add this line
                 console.log("Input String:", m["Match Datetime (UTC)"], "Resulting Date Object:", localTime.toISOString());
                 const isLocked = false; //new Date() > localTime;
