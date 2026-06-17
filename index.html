@@ -235,16 +235,21 @@
         function parseUtcDate(dateString) {
             if (!dateString) return null;
         
-            // 1. If it has a space, replace it with 'T' (e.g., "2026-06-18 17:00" -> "2026-06-18T17:00")
-            let isoString = dateString.replace(" ", "T");
-        
-            // 2. Add 'Z' if it's missing, to force UTC
-            if (!isoString.endsWith('Z')) {
-                isoString += 'Z';
+            // 1. Remove any existing 'Z' to avoid double-appending
+            let cleanString = dateString.replace('Z', '');
+            
+            // 2. Ensure it has 'T' separator (e.g., "2026-06-18 23:00" -> "2026-06-18T23:00")
+            // If the sheet already has the T, this won't break it.
+            if (!cleanString.includes('T')) {
+                cleanString = cleanString.replace(' ', 'T');
             }
+        
+            // 3. Append 'Z' to explicitly tell JS: "This is UTC"
+            const utcDateString = cleanString.endsWith('Z') ? cleanString : cleanString + 'Z';
             
-            const d = new Date(isoString);
+            const d = new Date(utcDateString);
             
+            // 4. Verify validity
             if (isNaN(d.getTime())) {
                 console.warn("Could not parse date:", dateString);
                 return null;
