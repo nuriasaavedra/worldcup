@@ -5,241 +5,791 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏆 World Cup 2026 Quiniela</title>
 
+    <meta property="og:title" content="🏆 World Cup 2026 Friends Quiniela">
+    <meta property="og:description" content="Predict scores, track standings live, and check the leaderboard. See who dominates the tournament!">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=500">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
+
     <style>
         .active-tab { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #60a5fa; font-weight: 800; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .glass-panel { background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
-<body class="bg-[#0b0f19] min-h-screen text-slate-200 font-sans pb-16 antialiased">
 
-    <nav class="sticky top-0 bg-[#0b0f19]/90 backdrop-blur-md z-40 border-b border-slate-800/80">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🏆</span>
-                <h1 class="text-sm font-black tracking-wider uppercase text-white">Quiniela 2026</h1>
+<body class="bg-[#0b0f19] min-h-screen text-slate-200 font-sans pb-16 antialiased">
+    <nav class="sticky top-0 bg-[#0b0f19]/80 backdrop-blur-md z-40 border-b border-slate-800/80">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+                <span class="text-2xl drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">🏆</span>
+                <h1 class="text-lg font-black tracking-wider uppercase text-white bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">QUINIELA 2026</h1>
             </div>
-            <select id="userSelect" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-black text-blue-400 outline-none cursor-pointer">
-                <option value="Nunu">Nunu</option>
-                <option value="Charlie">Charlie</option>
-                <option value="Paddy">Paddy</option>
-                <option value="Lore">Lore</option>
-            </select>
+
+            <div class="flex items-center gap-2.5 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-slate-800 shadow-inner">
+                <label for="userSelect" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Predictor:</label>
+                <select id="userSelect" class="bg-transparent font-black text-blue-400 outline-none cursor-pointer text-sm pr-1">
+                    <option value="Nunu" class="bg-[#0b0f19] text-white">Nunu</option>
+                    <option value="Charlie" class="bg-[#0b0f19] text-white">Charlie</option>
+                    <option value="Paddy" class="bg-[#0b0f19] text-white">Paddy</option>
+                    <option value="Lore" class="bg-[#0b0f19] text-white">Lore</option>
+                </select>
+            </div>
         </div>
 
-        <div class="max-w-5xl mx-auto px-4 overflow-x-auto flex text-[10px] font-bold tracking-widest uppercase text-slate-400">
-            <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="active-tab px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🏠 Leaderboard</button>
-            <button onclick="switchTab('group-matches')" id="tab-group-matches" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📅 Matches</button>
-            <button onclick="switchTab('group-tables')" id="tab-group-tables" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📊 Standings</button>
-            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🌳 Brackets</button>
+        <div class="max-w-5xl mx-auto px-4 overflow-x-auto flex text-xs font-bold tracking-wider uppercase text-slate-400">
+            <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="active-tab px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">🏠 Leaderboard</button>
+            <button onclick="switchTab('group-tables')" id="tab-group-tables" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">📊 Standings</button>
+            <button onclick="switchTab('group-matches')" id="tab-group-matches" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">📅 Matches</button>
+            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">🌳 Brackets</button>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 mt-8">
-        <div id="loading" class="text-center py-20 text-slate-500 font-black uppercase tracking-widest">Syncing Pipeline...</div>
+        <div id="loading" class="flex flex-col items-center justify-center py-32 gap-4 text-slate-500">
+            <div class="animate-spin rounded-full h-10 w-10 border-2 border-slate-800 border-t-blue-500"></div>
+            <p class="text-xs uppercase tracking-widest font-bold animate-pulse">Syncing Matrix Pipeline...</p>
+        </div>
 
-        <section id="view-leaderboard" class="space-y-4">
-            <div id="leaderboardList" class="glass-panel rounded-2xl overflow-hidden divide-y divide-slate-800"></div>
+        <section id="view-leaderboard" class="hidden space-y-6 animate-fade-in">
+            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden bg-gradient-to-br from-slate-900/80 via-blue-950/20 to-slate-900/80 border border-blue-500/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+                <div class="relative z-10">
+                    <h2 class="text-xl font-black uppercase text-white tracking-wide">Live Standings</h2>
+                    <p class="text-slate-400 text-xs mt-1">Metrics: 5pts Exact Score Match | 3pts Outcome + GD Hit | 2pts Straight Match Winner</p>
+                </div>
+                <div class="absolute -right-4 -bottom-10 opacity-5 font-black text-[12rem] pointer-events-none">#1</div>
+            </div>
+
+            <div class="glass-panel rounded-2xl overflow-hidden shadow-xl">
+                <div class="grid grid-cols-12 bg-slate-900/70 p-4 border-b border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                    <div class="col-span-2 text-center">Rank</div>
+                    <div class="col-span-6">Contender</div>
+                    <div class="col-span-4 text-right pr-4">Total Score</div>
+                </div>
+                <div id="leaderboardList" class="divide-y divide-slate-800/60">
+                    </div>
+            </div>
         </section>
 
         <section id="view-group-matches" class="hidden space-y-4">
-            <div class="flex flex-col md:flex-row gap-3 glass-panel p-4 rounded-xl">
-                <input type="date" id="dateFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold w-full outline-none">
-                <select id="stageFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold w-full outline-none">
-                    <option value="all">All Stages</option>
-                </select>
+            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-xl">
+                <h3 class="font-black uppercase tracking-wider text-sm text-slate-300">Group Stage Matches</h3>
+                <div class="flex items-center gap-3 text-xs">
+                    <label class="font-bold text-slate-500 uppercase tracking-wider">Timeline Filter:</label>
+                    <input type="date" id="dateFilter" class="bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg outline-none font-bold focus:border-blue-500">
+                </div>
             </div>
-            <div id="matchesContainer" class="space-y-2"></div>
+
+            <div id="matchesContainer" class="space-y-3">
+                </div>
         </section>
 
-        <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4"></section>
+        <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+            </section>
 
-        <section id="view-knockout" class="hidden space-y-8"></section>
+        <section id="view-knockout" class="hidden space-y-8">
+            <div id="knockoutContainer" class="flex flex-col gap-8">
+                </div>
+        </section>
     </main>
 
-    <div id="predictionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="glass-panel rounded-2xl max-w-sm w-full p-6 border border-slate-800">
-            <h3 id="modalMatchInfo" class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 text-center"></h3>
-            <div class="flex items-center justify-center gap-4 mb-6">
-                <div class="text-center w-1/3 text-xs font-bold"><div id="homeFlag" class="text-2xl mb-1"></div><div id="homeName"></div></div>
-                <div class="flex gap-1">
-                    <input type="number" id="inputHome" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded-lg text-center text-xl font-black text-white">
-                    <input type="number" id="inputAway" class="w-12 h-12 bg-slate-950 border border-slate-800 rounded-lg text-center text-xl font-black text-white">
+    <div id="predictionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden z-50">
+        <div class="glass-panel bg-slate-900 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-800">
+            <div class="bg-slate-950/60 px-4 py-3 border-b border-slate-800/80 flex justify-between items-center">
+                <span id="modalStage" class="text-[10px] font-black uppercase text-blue-400 bg-blue-950/50 px-2 py-0.5 rounded border border-blue-900/50 tracking-wider">Stage</span>
+                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-300 font-bold text-xl cursor-pointer">&times;</button>
+
+            </div>
+
+            <div class="p-6 space-y-6 text-center">
+
+                <div class="flex flex-col items-center gap-1.5">
+
+                    <div id="modalVenue" class="text-[10px] font-bold text-emerald-400/80 uppercase tracking-wider">Venue Location</div>
+
+                    <h4 class="font-black text-slate-400 text-[10px] uppercase tracking-widest">Update Match Prediction</h4>
+
                 </div>
-                <div class="text-center w-1/3 text-xs font-bold"><div id="awayFlag" class="text-2xl mb-1"></div><div id="awayName"></div></div>
+
+                
+
+                <div class="flex items-center justify-center gap-4">
+
+                    <div class="w-5/12 text-center space-y-1">
+
+                        <span id="modalHomeFlag" class="text-2xl block"></span>
+
+                        <p id="modalTeamHome" class="font-black text-white text-sm tracking-wide line-clamp-2"></p>
+
+                    </div>
+
+                    <div class="flex items-center gap-1">
+
+                        <input type="number" id="inputHome" min="0" placeholder="0" class="w-12 h-14 text-center text-2xl font-black bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                        <span class="text-slate-700 font-black text-xl mx-0.5">:</span>
+
+                        <input type="number" id="inputAway" min="0" placeholder="0" class="w-12 h-14 text-center text-2xl font-black bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                    </div>
+
+                    <div class="w-5/12 text-center space-y-1">
+
+                        <span id="modalAwayFlag" class="text-2xl block"></span>
+
+                        <p id="modalTeamAway" class="font-black text-white text-sm tracking-wide line-clamp-2"></p>
+
+                    </div>
+
+                </div>
+
+                
+
+                <p id="modalTimeNotice" class="text-slate-500 text-[11px] font-medium tracking-wide">Time localization context mapping</p>
+
             </div>
-            <div class="flex gap-2">
-                <button onclick="closeModal()" class="w-1/2 py-2 bg-slate-800 rounded-lg text-xs font-bold">Cancel</button>
-                <button id="btnSave" onclick="savePrediction()" class="w-1/2 py-2 bg-blue-600 rounded-lg text-xs font-bold">Save</button>
+
+            <div class="bg-slate-950/40 px-4 py-3 border-t border-slate-800/80 flex gap-3">
+
+                <button onclick="closeModal()" class="w-1/2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition text-xs uppercase tracking-wider cursor-pointer">Cancel</button>
+
+                <button id="btnSavePrediction" onclick="savePrediction()" class="w-1/2 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-indigo-500 shadow-md transition text-xs uppercase tracking-wider cursor-pointer">Save Score</button>
+
             </div>
+
         </div>
+
     </div>
 
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
-        
-        const flags = { "Mexico": "🇲🇽", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czechia": "🇨🇿", "Canada": "🇨🇦", "Bosnia and Herzegovina": "🇧🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭", "Brazil": "🇧🇷", "Morocco": "🇲🇦", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Haiti": "🇭🇹", "USA": "🇺🇸", "Paraguay": "🇵🇾", "Australia": "🇦🇺", "Türkiye": "🇹🇷", "Germany": "🇩🇪", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨", "Netherlands": "🇳🇱", "Japan": "🇯🇵", "Sweden": "🇸🇪", "Tunisia": "🇹🇳", "Belgium": "🇧🇪", "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿", "Spain": "🇪🇸", "Cape Verde": "🇨🇻", "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾", "France": "🇫🇷", "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴", "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴", "Portugal": "🇵🇹", "Congo DR": "🇨🇩", "Uzbekistan": "🇺🇿", "Colombia": "🇨🇴", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦" };
 
-        let appState = { matches: [], currentParticipant: "Nunu", filters: { date: "", stage: "all" } };
-        let activeMatch = null;
+
+    <script>
+
+        // 🌟 PASTE YOUR UPDATED DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
+
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
+
+
+
+        // Part B: Complete Dictionary Mapping Data for World Cup Flag Emoji Assets
+
+        const flags = {
+
+            "Mexico": "🇲🇽", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czechia": "🇨🇿",
+
+            "Canada": "🇨🇦", "Bosnia and Herzegovina": "🇧🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭",
+
+            "Brazil": "🇧🇷", "Morocco": "🇲🇦", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Haiti": "🇭🇹",
+
+            "USA": "🇺🇸", "Paraguay": "🇵🇾", "Australia": "🇦🇺", "Türkiye": "🇹🇷",
+
+            "Germany": "🇩🇪", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨",
+
+            "Netherlands": "🇳🇱", "Japan": "🇯🇵", "Sweden": "🇸🇪", "Tunisia": "🇹🇳",
+
+            "Belgium": "🇧🇪", "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿",
+
+            "Spain": "🇪🇸", "Cape Verde": "🇨🇻", "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾",
+
+            "France": "🇫🇷", "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴",
+
+            "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴",
+
+            "Portugal": "🇵🇹", "Congo DR": "🇨🇩", "Uzbekistan": "🇺🇿", "Colombia": "🇨🇴",
+
+            "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+
+        };
+
+
+
+        function getFlag(teamName) { return flags[teamName] || "🏳️"; }
+
+
+
+        let appState = { matches: [], currentParticipant: "Nunu" };
+
+        let activeMatchId = null;
+
+
+
+        document.getElementById('userSelect').addEventListener('change', (e) => {
+
+            appState.currentParticipant = e.target.value;
+
+            renderAllViews();
+
+        });
+
+
+
+        document.getElementById('dateFilter').addEventListener('input', (e) => {
+
+            renderGroupMatches(e.target.value);
+
+        });
+
+
 
         async function init() {
+
             try {
+
+                if(WEB_APP_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
+
+                    document.getElementById('loading').innerHTML = "<p class='text-red-400 font-bold p-4 text-center text-xs uppercase tracking-widest border border-red-900/30 rounded-xl bg-red-950/20'>Configuration Warning:<br>You forgot to insert your Apps Script Web App URL in the code configuration index line 124!</p>";
+
+                    return;
+
+                }
+
                 const res = await fetch(WEB_APP_URL);
+
                 appState.matches = await res.json();
+
                 document.getElementById('loading').classList.add('hidden');
-                populateFilters();
-                renderAll();
-            } catch(e) { console.error(e); }
+
+                switchTab('leaderboard');
+
+            } catch (err) {
+
+                console.error(err);
+
+                document.getElementById('loading').textContent = "Database communication network error pipeline blocked.";
+
+            }
+
         }
 
-        function populateFilters() {
-            const stages = [...new Set(appState.matches.map(m => m.Stage))];
-            const select = document.getElementById('stageFilter');
-            stages.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s; opt.textContent = s;
-                select.appendChild(opt);
-            });
-        }
+
 
         function switchTab(tabId) {
+
             ['leaderboard', 'group-matches', 'group-tables', 'knockout'].forEach(t => {
-                document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tabId);
-                document.getElementById(`tab-${t}`).classList.toggle('active-tab', t === tabId);
+
+                document.getElementById(`view-${t}`).classList.add('hidden');
+
+                document.getElementById(`tab-${t}`).classList.remove('active-tab');
+
             });
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+
+            renderAllViews();
+
         }
 
-        function renderAll() {
-            renderLeaderboard();
-            renderMatches();
-            renderTables();
-            renderBrackets();
+
+
+        function renderAllViews() {
+
+            calculateLeaderboard();
+
+            renderGroupMatches();
+
+            renderGroupTables();
+
+            renderKnockoutTree();
+
         }
 
-        function renderLeaderboard() {
+
+
+        function computePoints(realH, realA, predH, predA) {
+
+            if ([realH, realA, predH, predA].some(x => x === "" || x === null || x === undefined)) return 0;
+
+            const rh = parseInt(realH), ra = parseInt(realA);
+
+            const ph = parseInt(predH), pa = parseInt(predA);
+
+            if (rh === ph && ra === pa) return 5;
+
+            if (Math.sign(rh - ra) === Math.sign(ph - pa)) {
+
+                if ((rh - ra) === (ph - pa)) return 3;
+
+                return 2;
+
+            }
+
+            return 0;
+
+        }
+
+
+
+        function calculateLeaderboard() {
+
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
+
             appState.matches.forEach(m => {
-                const h = m["Real Score Home"], a = m["Real Score Away"];
-                if(h === "") return;
-                ["Nunu", "Charlie", "Paddy", "Lore"].forEach(p => {
-                    const ph = m[p+" Home"], pa = m[p+" Away"];
-                    if(ph == h && pa == a) scores[p] += 5;
-                    else if(Math.sign(h-a) == Math.sign(ph-pa)) scores[p] += (h-a == ph-pa) ? 3 : 2;
-                });
+
+                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
+
+                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
+
+                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"]);
+
+                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"]);
+
             });
-            document.getElementById('leaderboardList').innerHTML = Object.entries(scores).sort((a,b) => b[1]-a[1]).map(([n, s]) => `
-                <div class="grid grid-cols-12 p-4 items-center">
-                    <div class="col-span-8 font-bold ${n === appState.currentParticipant ? 'text-blue-400' : 'text-slate-300'}">${n}</div>
-                    <div class="col-span-4 text-right font-black">${s} pts</div>
-                </div>`).join('');
-        }
 
-        function renderMatches() {
-            const container = document.getElementById('matchesContainer');
-            const dateFilter = document.getElementById('dateFilter').value;
-            const stageFilter = document.getElementById('stageFilter').value;
 
-            container.innerHTML = appState.matches.filter(m => {
-                const dMatch = new Date(m["Match Datetime (MTY)"]).toISOString().split('T')[0];
-                const dMatchCheck = dateFilter ? dMatch === dateFilter : true;
-                const sMatchCheck = stageFilter !== "all" ? m.Stage === stageFilter : true;
-                return dMatchCheck && sMatchCheck;
-            }).map(m => {
-                const isLocked = new Date() > new Date(m["Match Datetime (MTY)"]);
-                const pH = m[appState.currentParticipant + " Home"];
-                const pA = m[appState.currentParticipant + " Away"];
-                return `
-                    <div onclick="${isLocked ? '' : `openModal('${m.ID}')`}" class="glass-panel p-4 rounded-xl flex justify-between items-center ${isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-800'}">
-                        <div class="text-[10px] font-bold text-slate-500 w-1/4">${m.Stage}</div>
-                        <div class="text-xs font-bold w-2/4 text-center truncate">${m.Match}</div>
-                        <div class="text-blue-400 font-black text-right w-1/4">${pH !== null && pH !== "" ? `${pH}-${pA}` : (isLocked ? 'Locked' : 'Bet')}</div>
-                    </div>`;
-            }).join('');
-        }
 
-        function renderTables() {
-            const container = document.getElementById('view-group-tables');
+            const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+
+            const container = document.getElementById('leaderboardList');
+
             container.innerHTML = "";
-            const stages = [...new Set(appState.matches.map(m => m.Stage))].filter(s => s.includes("Group"));
-            stages.forEach(st => {
-                const teams = {};
-                appState.matches.filter(m => m.Stage === st).forEach(m => {
-                    const [t1, t2] = m.Match.split(' vs ');
-                    [t1, t2].forEach(t => { if(!teams[t]) teams[t] = {p:0, gd:0}; });
-                    const rh = parseInt(m["Real Score Home"]), ra = parseInt(m["Real Score Away"]);
-                    if(!isNaN(rh)) {
-                        teams[t1].gd += (rh-ra); teams[t2].gd += (ra-rh);
-                        if(rh > ra) teams[t1].p += 3; else if(ra > rh) teams[t2].p += 3; else {teams[t1].p++; teams[t2].p++;}
-                    }
-                });
+
+
+
+            sorted.forEach(([name, score], idx) => {
+
+                const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "⚡";
+
                 container.innerHTML += `
-                    <div class="glass-panel p-4 rounded-xl">
-                        <h4 class="font-black text-xs text-slate-500 mb-2">${st}</h4>
-                        ${Object.entries(teams).sort((a,b) => b[1].p - a[1].p).map(([n, d]) => `
-                            <div class="flex justify-between text-xs py-1 border-b border-slate-800">
-                                <span>${flags[n] || "🏳️"} ${n}</span><span class="font-bold">${d.p} pts</span>
-                            </div>`).join('')}
-                    </div>`;
+
+                    <div class="grid grid-cols-12 p-4 items-center hover:bg-slate-900/30 transition border-b border-slate-900/40">
+
+                        <div class="col-span-2 text-center font-bold text-slate-500 text-sm">${medal}</div>
+
+                        <div class="col-span-6 font-bold text-slate-300 ${name === appState.currentParticipant ? 'text-blue-400 font-black' : ''}">${name}</div>
+
+                        <div class="col-span-4 text-right pr-4 font-black text-white text-base">${score} <span class="text-xs text-slate-500 font-normal">pts</span></div>
+
+                    </div>
+
+                `;
+
             });
+
         }
 
-        function renderBrackets() {
-            const container = document.getElementById('view-knockout');
+
+
+        function renderGroupMatches(filterDate = "") {
+
+            const container = document.getElementById('matchesContainer');
+
             container.innerHTML = "";
-            const stages = [...new Set(appState.matches.map(m => m.Stage))].filter(s => !s.includes("Group"));
-            stages.forEach(st => {
-                container.innerHTML += `<div><h4 class="font-black text-xs text-slate-500 mb-2">${st}</h4><div class="grid grid-cols-2 gap-2">
-                    ${appState.matches.filter(m => m.Stage === st).map(m => `
-                        <div class="glass-panel p-2 rounded text-[10px] font-bold text-center">${m.Match}</div>`).join('')}
-                </div></div>`;
+
+            const groupMatches = appState.matches.filter(m => m["Stage"].startsWith("Group"));
+
+            let upcomingTargetNode = null;
+
+
+
+            groupMatches.forEach(m => {
+
+                const localTime = new Date(m["Match Datetime (MTY)"]);
+
+                const matchDateString = localTime.toISOString().split('T')[0];
+
+                if (filterDate && matchDateString !== filterDate) return;
+
+
+
+                const isLocked = new Date() > localTime;
+
+                const pH = m[`${appState.currentParticipant} Home`] ?? "";
+
+                const pA = m[`${appState.currentParticipant} Away`] ?? "";
+
+                const rH = m["Real Score Home"] ?? "";
+
+                const rA = m["Real Score Away"] ?? "";
+
+
+
+                const tHome = m["Match"].split(' vs ')[0];
+
+                const tAway = m["Match"].split(' vs ')[1];
+
+
+
+                const rowId = `match-row-${m["ID"]}`;
+
+                if (!isLocked && !upcomingTargetNode) upcomingTargetNode = rowId;
+
+
+
+                container.innerHTML += `
+
+                    <div id="${rowId}" onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
+
+                         class="glass-panel p-4 rounded-xl flex items-center justify-between gap-2 transition ${isLocked ? 'opacity-50 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
+
+                        <div class="w-1/4 text-[10px] font-bold text-slate-500">
+
+                            <div class="text-slate-400 text-xs font-black">${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+
+                            <div>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})}</div>
+
+                            <div class="text-[9px] text-indigo-400/80 uppercase font-black mt-0.5 tracking-tight">${m["Stage"]}</div>
+
+                        </div>
+
+                        <div class="w-2/4 flex items-center justify-center gap-1.5 text-xs font-black text-white">
+
+                            <span class="w-5/12 text-right truncate">${getFlag(tHome)} ${tHome}</span>
+
+                            <span class="bg-slate-950 border border-slate-800 text-blue-400 px-2 py-1 rounded text-[10px] font-black min-w-[38px] text-center tracking-tighter">
+
+                                ${rH !== "" ? `${rH}-${rA}` : 'VS'}
+
+                            </span>
+
+                            <span class="w-5/12 text-left truncate">${tAway} ${getFlag(tAway)}</span>
+
+                        </div>
+
+                        <div class="w-1/4 text-right">
+
+                            <span class="text-[9px] text-slate-500 block uppercase font-black tracking-widest">Prediction</span>
+
+                            <span class="inline-block text-[11px] font-black px-2 py-0.5 rounded ${pH !== "" ? 'bg-blue-950/40 text-blue-400 border border-blue-900/50' : 'bg-slate-950 text-slate-600'}">
+
+                                ${pH !== "" ? `${pH} - ${pA}` : '🔒 Clear'}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
             });
+
+
+
+            if (!filterDate && upcomingTargetNode) {
+
+                setTimeout(() => { document.getElementById(upcomingTargetNode)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+
+            }
+
         }
 
-        function openModal(id) {
-            activeMatch = appState.matches.find(m => m.ID === id);
-            const [h, a] = activeMatch.Match.split(' vs ');
-            document.getElementById('modalMatchInfo').textContent = `${activeMatch.Stage} | ${h} vs ${a}`;
-            document.getElementById('homeName').textContent = h;
-            document.getElementById('awayName').textContent = a;
-            document.getElementById('homeFlag').textContent = flags[h] || "🏳️";
-            document.getElementById('awayFlag').textContent = flags[a] || "🏳️";
-            document.getElementById('inputHome').value = activeMatch[appState.currentParticipant + " Home"] || "";
-            document.getElementById('inputAway').value = activeMatch[appState.currentParticipant + " Away"] || "";
+
+
+        function renderGroupTables() {
+
+            const container = document.getElementById('view-group-tables');
+
+            container.innerHTML = "";
+
+            const letters = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+
+
+            letters.forEach(g => {
+
+                const groupLabel = `Group ${g}`;
+
+                const mList = appState.matches.filter(m => m["Stage"] === groupLabel);
+
+                const table = {};
+
+
+
+                mList.forEach(m => {
+
+                    const teams = m["Match"].split(' vs ');
+
+                    teams.forEach(t => { if(!table[t]) table[t] = { name: t, p:0, gd:0, gf:0 } });
+
+
+
+                    const rh = m["Real Score Home"], ra = m["Real Score Away"];
+
+                    if (rh !== "" && ra !== "" && rh !== null && ra !== null) {
+
+                        const h = parseInt(rh), a = parseInt(ra);
+
+                        table[teams[0]].gf += h; table[teams[1]].gf += a;
+
+                        table[teams[0]].gd += (h - a); table[teams[1]].gd += (a - h);
+
+                        if (h > a) table[teams[0]].p += 3;
+
+                        else if (a > h) table[teams[1]].p += 3;
+
+                        else { table[teams[0]].p += 1; table[teams[1]].p += 1; }
+
+                    }
+
+                });
+
+
+
+                const sortedTeams = Object.values(table).sort((a,b) => b.p - a.p || b.gd - a.gd || b.gf - a.gf);
+
+                if (sortedTeams.length === 0) return;
+
+
+
+                let rowsHtml = "";
+
+                sortedTeams.forEach((t, i) => {
+
+                    rowsHtml += `
+
+                        <div class="grid grid-cols-12 p-2.5 text-xs border-b border-slate-900/30 items-center text-slate-300">
+
+                            <span class="col-span-1 text-slate-600 font-bold text-center">${i+1}</span>
+
+                            <span class="col-span-6 font-bold truncate">${getFlag(t.name)} ${t.name}</span>
+
+                            <span class="col-span-1 text-center font-bold text-slate-400">${t.gf}</span>
+
+                            <span class="col-span-2 text-center font-bold ${t.gd > 0 ? 'text-emerald-400' : t.gd < 0 ? 'text-red-400/80' : 'text-slate-500'}">${t.gd > 0 ? '+'+t.gd : t.gd}</span>
+
+                            <span class="col-span-2 text-right font-black text-white pr-2">${t.p} <span class="text-[9px] font-normal text-slate-500">pts</span></span>
+
+                        </div>
+
+                    `;
+
+                });
+
+
+
+                container.innerHTML += `
+
+                    <div class="glass-panel rounded-xl overflow-hidden shadow-lg">
+
+                        <div class="bg-slate-900/90 text-slate-300 border-b border-slate-800 font-black px-4 py-2.5 text-xs uppercase tracking-wider">${groupLabel}</div>
+
+                        <div class="grid grid-cols-12 p-2 bg-slate-950/40 text-[9px] font-black uppercase text-slate-500 tracking-widest">
+
+                            <span class="col-span-1 text-center">#</span>
+
+                            <span class="col-span-6">Team</span>
+
+                            <span class="col-span-1 text-center">GF</span>
+
+                            <span class="col-span-2 text-center">GD</span>
+
+                            <span class="col-span-2 text-right pr-2">Total</span>
+
+                        </div>
+
+                        <div class="divide-y divide-slate-900/40 bg-slate-900/10">${rowsHtml}</div>
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+
+
+        function renderKnockoutTree() {
+
+            const container = document.getElementById('knockoutContainer');
+
+            container.innerHTML = "";
+
+            const stages = ["Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Third Place Play-off", "Final"];
+
+
+
+            stages.forEach(st => {
+
+                const legs = appState.matches.filter(m => m["Stage"] === st);
+
+                if(legs.length === 0) return;
+
+
+
+                let cardsHtml = "";
+
+                legs.forEach(m => {
+
+                    const localTime = new Date(m["Match Datetime (MTY)"]);
+
+                    const isLocked = new Date() > localTime;
+
+                    const pH = m[`${appState.currentParticipant} Home`] ?? "";
+
+                    const pA = m[`${appState.currentParticipant} Away`] ?? "";
+
+                    const rH = m["Real Score Home"] ?? "";
+
+                    const rA = m["Real Score Away"] ?? "";
+
+
+
+                    const tHome = m["Match"].split(' vs ')[0];
+
+                    const tAway = m["Match"].split(' vs ')[1];
+
+
+
+                    cardsHtml += `
+
+                        <div onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
+
+                             class="glass-panel p-3.5 rounded-xl flex flex-col justify-between shadow-lg transition ${isLocked ? 'opacity-40 bg-slate-950/20' : 'hover:border-blue-500/40 hover:bg-slate-900/30 cursor-pointer'}">
+
+                            <div class="text-[9px] font-bold text-slate-500 flex justify-between tracking-tight uppercase border-b border-slate-900/40 pb-1 mb-2">
+
+                                <span class="text-blue-400 font-black">${m["ID"]}</span>
+
+                                <span>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})} ${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+
+                            </div>
+
+                            <div class="space-y-1.5 my-1">
+
+                                <div class="flex justify-between text-xs font-black text-slate-300">
+
+                                    <span class="truncate pr-1">${getFlag(tHome)} ${tHome}</span>
+
+                                    <span class="text-white">${rH !== "" ? rH : '-'}</span>
+
+                                </div>
+
+                                <div class="flex justify-between text-xs font-black text-slate-300">
+
+                                    <span class="truncate pr-1">${getFlag(tAway)} ${tAway}</span>
+
+                                    <span class="text-white">${rA !== "" ? rA : '-'}</span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="border-t border-slate-900/40 mt-2 pt-1.5 flex justify-between text-[9px] items-center uppercase font-black tracking-widest">
+
+                                <span class="text-slate-500">Prediction:</span>
+
+                                <span class="text-blue-400 font-black bg-blue-950/30 px-1.5 py-0.5 rounded border border-blue-900/30">${pH !== "" ? `${pH} - ${pA}` : 'Empty'}</span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+
+
+                container.innerHTML += `
+
+                    <div>
+
+                        <h4 class="text-xs font-black uppercase text-slate-500 tracking-widest border-l-2 border-blue-500 pl-2 mb-3.5">${st}</h4>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5">${cardsHtml}</div>
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+
+
+        function openModal(matchId) {
+
+            activeMatchId = matchId;
+
+            const match = appState.matches.find(m => m["ID"] === matchId);
+
+            const localTime = new Date(match["Match Datetime (MTY)"]);
+
+
+
+            const tHome = match["Match"].split(' vs ')[0];
+
+            const tAway = match["Match"].split(' vs ')[1];
+
+
+
+            document.getElementById('modalStage').textContent = match["Stage"];
+
+            document.getElementById('modalVenue').textContent = match["Stadium / City"] || "TBD Stadium Venue";
+
+            document.getElementById('modalTeamHome').textContent = tHome;
+
+            document.getElementById('modalTeamAway').textContent = tAway;
+
+            
+
+            document.getElementById('modalHomeFlag').textContent = getFlag(tHome);
+
+            document.getElementById('modalAwayFlag').textContent = getFlag(tAway);
+
+            
+
+            document.getElementById('modalTimeNotice').textContent = `Kickoff: ${localTime.toLocaleString([], {weekday: 'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
+
+            
+
+            document.getElementById('inputHome').value = match[`${appState.currentParticipant} Home`] ?? "";
+
+            document.getElementById('inputAway').value = match[`${appState.currentParticipant} Away`] ?? "";
+
+
+
             document.getElementById('predictionModal').classList.remove('hidden');
+
         }
 
-        function closeModal() { document.getElementById('predictionModal').classList.add('hidden'); }
+
+
+        function closeModal() {
+
+            document.getElementById('predictionModal').classList.add('hidden');
+
+            activeMatchId = null;
+        }
 
         async function savePrediction() {
-            const h = document.getElementById('inputHome').value;
-            const a = document.getElementById('inputAway').value;
-            const btn = document.getElementById('btnSave');
-            btn.disabled = true; btn.textContent = "Saving...";
-            
+            const hVal = document.getElementById('inputHome').value;
+            const aVal = document.getElementById('inputAway').value;
+            if (hVal === "" || aVal === "") { alert("Please enter prediction parameters mapping scores."); return; }
+            const btn = document.getElementById('btnSavePrediction');
+            btn.disabled = true; btn.textContent = "Processing...";
+            const payload = {
+                matchId: activeMatchId,
+                participant: appState.currentParticipant,
+                homeScore: parseInt(hVal),
+                awayScore: parseInt(aVal)
+            };
+
             try {
                 await fetch(WEB_APP_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ matchId: activeMatch.ID, participant: appState.currentParticipant, homeScore: parseInt(h), awayScore: parseInt(a) })
+                    body: JSON.stringify(payload)
                 });
-                
-                const idx = appState.matches.findIndex(m => m.ID === activeMatch.ID);
-                appState.matches[idx][appState.currentParticipant + " Home"] = h;
-                appState.matches[idx][appState.currentParticipant + " Away"] = a;
-                
+                const idx = appState.matches.findIndex(m => m["ID"] === activeMatchId);
+                appState.matches[idx][`${appState.currentParticipant} Home`] = payload.homeScore;
+                appState.matches[idx][`${appState.currentParticipant} Away`] = payload.awayScore;
                 closeModal();
-                renderAll();
-            } catch(e) { alert("Save failed"); } finally { btn.disabled = false; btn.textContent = "Save"; }
+                renderAllViews();
+            } catch (err) {
+                console.error(err);
+                alert("Data communication failed.");
+            } finally {
+                btn.disabled = false; btn.textContent = "Save Score";
+            }
         }
-
-        document.getElementById('userSelect').addEventListener('change', (e) => { appState.currentParticipant = e.target.value; renderAll(); });
-        document.getElementById('dateFilter').addEventListener('change', renderMatches);
-        document.getElementById('stageFilter').addEventListener('change', renderMatches);
-
         window.onload = init;
     </script>
 </body>
-</html>
+</html> 
