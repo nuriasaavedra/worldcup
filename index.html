@@ -199,7 +199,7 @@
                 
                 // Set default date to today
                 const today = new Date().toISOString().split('T')[0];
-                document.getElementById('dateFilter').value = today;
+                document.getElementById('dateFilter').value = "";
                 document.getElementById('groupFilter').value = "All";
     
                 renderAllViews(true);
@@ -274,7 +274,7 @@
 
         function renderGroupMatches(filterDate = "") {
             const container = document.getElementById('matchesContainer');
-            const dateFilter = (filterDate === true) ? "" : document.getElementById('dateFilter').value;
+            const dateFilter = isInitial ? "" : document.getElementById('dateFilter').value;
             const groupFilter = document.getElementById('groupFilter').value;
 
             container.innerHTML = "";
