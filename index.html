@@ -361,10 +361,10 @@
 
                 if (!localTime) return false;
                 
-                const y = localTime.getFullYear();
-                const m = String(localTime.getMonth() + 1).padStart(2, '0');
-                const d = String(localTime.getDate()).padStart(2, '0');
-                const matchDateString = `${y}-${m}-${d}`;
+                const yearVal = localTime.getFullYear();
+                const monthVal = String(localTime.getMonth() + 1).padStart(2, '0');
+                const dayVal = String(localTime.getDate()).padStart(2, '0');
+                const matchDateString = `${yearVal}-${monthVal}-${dayVal}`;
                 
                 const matchesDate = (dateFilter === "" || matchDateString === dateFilter);
                 const matchesGroup = (groupFilter === "All" || m["Stage"] === groupFilter);
