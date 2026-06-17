@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 World Cup 2026 Quiniela</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .active-tab { border-color: #2563eb; color: #2563eb; font-weight: 700; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <nav class="sticky top-0 bg-white/90 backdrop-blur shadow-sm z-40 border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🏆</span>
+                <h1 class="text-xl font-black tracking-tight text-slate-900">Quiniela 2026</h1>
+            </div>
+            
+            <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                <label for="userSelect" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Predictor:</label>
+                <select id="userSelect" class="bg-transparent font-bold text-slate-800 outline-none cursor-pointer text-sm">
+                    <option value="Nunu">Nunu</option>
+                    <option value="Charlie">Charlie</option>
+                    <option value="Paddy">Paddy</option>
+                    <option value="Lore">Lore</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 overflow-x-auto flex border-t border-slate-100 text-sm font-medium text-slate-500">
+            <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="active-tab px-4 py-3 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🏠 Leaderboard</button>
+            <button onclick="switchTab('group-matches')" id="tab-group-matches" class="px-4 py-3 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📅 Group Matches</button>
+            <button onclick="switchTab('group-tables')" id="tab-group-tables" class="px-4 py-3 border-b-2 border-transparent whitespace-nowrap cursor-pointer">📊 Standings</button>
+            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-4 py-3 border-b-2 border-transparent whitespace-nowrap cursor-pointer">🌳 Knockout Stage</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+        
+        <div id="loading" class="flex flex-col items-center justify-center py-24 gap-3 text-slate-400">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-blue-600"></div>
+            <p class="text-sm font-medium">Fetching sync data from Google Sheets...</p>
+        </div>
+
+        <section id="view-leaderboard" class="hidden space-y-6">
+            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 text-white p-6 rounded-2xl shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-black">Current Standings</h2>
+                    <p class="text-blue-200 text-xs mt-1">Rule System: 5pts Exact Score | 3pts Winner + Goal Diff | 2pts Outcome Winner</p>
+                </div>
+                <div class="absolute -right-8 -bottom-8 opacity-10 text-9xl font-bold">#1</div>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="grid grid-cols-12 bg-slate-50 p-4 border-b border-slate-100 text-xs font-bold text-slate-500 tracking-wider">
+                    <div class="col-span-2 text-center">Rank</div>
+                    <div class="col-span-6">Participant</div>
+                    <div class="col-span-4 text-right pr-4">Total Score</div>
+                </div>
+                <div id="leaderboardList" class="divide-y divide-slate-100">
+                    </div>
+            </div>
+        </section>
+
+        <section id="view-group-matches" class="hidden space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-100">
+                <h3 class="font-bold text-lg text-slate-800">Tournament Schedule</h3>
+                <div class="flex items-center gap-2 text-sm">
+                    <label class="font-medium text-slate-500">Filter by Date:</label>
+                    <input type="date" id="dateFilter" class="border border-slate-200 px-3 py-1.5 rounded-lg outline-none bg-slate-50 font-medium">
+                </div>
+            </div>
+            <div id="matchesContainer" class="space-y-3">
+                </div>
+        </section>
+
+        <section id="view-group-tables" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+            </section>
+
+        <section id="view-knockout" class="hidden space-y-8">
+            <div class="bg-white p-4 rounded-xl border border-slate-100 mb-4 text-center">
+                <p class="text-sm text-slate-500 font-medium">Predictions lock individually for each leg as soon as their structural match timer starts.</p>
+            </div>
+            <div id="knockoutContainer" class="flex flex-col gap-8">
+                </div>
+        </section>
+
+    </main>
+
+    <div id="predictionModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50 animate-fade-in">
+        <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl overflow-hidden border border-slate-100">
+            <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                <span id="modalStage" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">Stage</span>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <div class="p-6 space-y-6 text-center">
+                <h4 class="font-bold text-slate-500 text-xs uppercase tracking-wider">Enter Score Prediction</h4>
+                
+                <div class="flex items-center justify-center gap-4">
+                    <div class="w-2/5 text-right">
+                        <p id="modalTeamHome" class="font-bold text-slate-800 break-words text-sm">Home</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input type="number" id="inputHome" min="0" placeholder="0" class="w-14 h-14 text-center text-2xl font-black bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                        <span class="text-slate-300 font-bold text-xl">:</span>
+                        <input type="number" id="inputAway" min="0" placeholder="0" class="w-14 h-14 text-center text-2xl font-black bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div class="w-2/5 text-left">
+                        <p id="modalTeamAway" class="font-bold text-slate-800 break-words text-sm">Away</p>
+                    </div>
+                </div>
+                
+                <p id="modalTimeNotice" class="text-slate-400 text-xs">Match localized time context</p>
+            </div>
+            <div class="bg-slate-50 px-4 py-3 border-t border-slate-100 flex gap-3">
+                <button onclick="closeModal()" class="w-1/2 py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-100 transition text-sm cursor-pointer">Cancel</button>
+                <button id="btnSavePrediction" onclick="savePrediction()" class="w-1/2 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-xs transition text-sm cursor-pointer">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🌟 REPLACE WITH YOUR GOOGLE APPS SCRIPT DEPLOYMENT WEB APP URL HERE:
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8HQBdNlvluKApj9PgC9rHW8fwj0xZwI3-WdsIl1WU6bomB7MtkFQO4cjewf16hxnDtw/exec";
+
+        let appState = {
+            matches: [],
+            currentParticipant: "Nunu"
+        };
+        let activeMatchId = null;
+
+        document.getElementById('userSelect').addEventListener('change', (e) => {
+            appState.currentParticipant = e.target.value;
+            renderAllViews();
+        });
+
+        document.getElementById('dateFilter').addEventListener('input', (e) => {
+            renderGroupMatches(e.target.value);
+        });
+
+        async function init() {
+            try {
+                const res = await fetch(WEB_APP_URL);
+                appState.matches = await res.json();
+                document.getElementById('loading').classList.add('hidden');
+                switchTab('leaderboard');
+            } catch (err) {
+                console.error("Critical Connection Failure: ", err);
+                alert("Failed syncing live database matrix. Confirm App Script deployment settings.");
+            }
+        }
+
+        function switchTab(tabId) {
+            ['leaderboard', 'group-matches', 'group-tables', 'knockout'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active-tab');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+            renderAllViews();
+        }
+
+        function renderAllViews() {
+            calculateLeaderboard();
+            renderGroupMatches();
+            renderGroupTables();
+            renderKnockoutTree();
+        }
+
+        // SCORING ALGORITHM ENGINE (5 / 3 / 2 / 0 Formula)
+        function computePoints(realH, realA, predH, predA) {
+            if ([realH, realA, predH, predA].some(x => x === "" || x === null || x === undefined)) return 0;
+            const rh = parseInt(realH), ra = parseInt(realA);
+            const ph = parseInt(predH), pa = parseInt(predA);
+
+            if (rh === ph && ra === pa) return 5; // Exact Match Score Hit
+
+            const realOutcome = Math.sign(rh - ra);
+            const predOutcome = Math.sign(ph - pa);
+
+            if (realOutcome === predOutcome) {
+                if ((rh - ra) === (ph - pa)) return 3; // Correct outcome winner + exact target GD
+                return 2; // Simple correct match outcome winner
+            }
+            return 0;
+        }
+
+        function calculateLeaderboard() {
+            const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };
+            appState.matches.forEach(m => {
+                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
+                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
+                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"]);
+                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"]);
+            });
+
+            const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = "";
+
+            sorted.forEach(([name, score], idx) => {
+                const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "🏃‍♂️";
+                container.innerHTML += `
+                    <div class="grid grid-cols-12 p-4 items-center hover:bg-slate-50 transition">
+                        <div class="col-span-2 text-center font-bold text-slate-400 text-sm">${medal}</div>
+                        <div class="col-span-6 font-bold text-slate-800 ${name === appState.currentParticipant ? 'text-blue-600 font-black' : ''}">${name}</div>
+                        <div class="col-span-4 text-right pr-4 font-black text-slate-900 text-base">${score} pts</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderGroupMatches(filterDate = "") {
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = "";
+            
+            // Filter strictly out group stages matches only
+            const groupMatches = appState.matches.filter(m => m["Stage"].startsWith("Group"));
+            let upcomingTargetNode = null;
+
+            groupMatches.forEach(m => {
+                const localTime = new Date(m["Match Datetime (MTY)"]);
+                const matchDateString = localTime.toISOString().split('T')[0];
+
+                if (filterDate && matchDateString !== filterDate) return;
+
+                const isLocked = new Date() > localTime;
+                const pH = m[`${appState.currentParticipant} Home`] ?? "";
+                const pA = m[`${appState.currentParticipant} Away`] ?? "";
+                const rH = m["Real Score Home"] ?? "";
+                const rA = m["Real Score Away"] ?? "";
+
+                const rowId = `match-row-${m["ID"]}`;
+                if (!isLocked && !upcomingTargetNode) upcomingTargetNode = rowId;
+
+                container.innerHTML += `
+                    <div id="${rowId}" onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
+                         class="bg-white p-4 rounded-xl border border-slate-100 shadow-xs flex items-center justify-between gap-2 transition ${isLocked ? 'opacity-70 bg-slate-50' : 'hover:border-blue-300 hover:shadow-sm cursor-pointer'}">
+                        <div class="w-1/4 text-xs font-semibold text-slate-400">
+                            <div>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})}</div>
+                            <div class="text-slate-600 font-bold text-sm">${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                            <div class="text-[10px] text-blue-500 uppercase font-bold tracking-tight">${m["Stage"]}</div>
+                        </div>
+                        <div class="w-2/4 flex items-center justify-center gap-2 text-sm font-bold text-slate-700">
+                            <span class="w-5/12 text-right truncate">${m["Match"].split(' vs ')[0]}</span>
+                            <span class="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-xs font-black min-w-[36px] text-center">
+                                ${rH !== "" ? `${rH}-${rA}` : 'vs'}
+                            </span>
+                            <span class="w-5/12 text-left truncate">${m["Match"].split(' vs ')[1]}</span>
+                        </div>
+                        <div class="w-1/4 text-right">
+                            <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Your Bet</span>
+                            <span class="inline-block text-xs font-black px-2 py-1 rounded-md ${pH !== "" ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-400'}">
+                                ${pH !== "" ? `${pH} - ${pA}` : '🔒 Empty'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Auto placing contextual focus near active matches if group stage context is running
+            if (!filterDate && upcomingTargetNode) {
+                setTimeout(() => {
+                    document.getElementById(upcomingTargetNode)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+
+        function renderGroupTables() {
+            const container = document.getElementById('view-group-tables');
+            container.innerHTML = "";
+            const letters = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+            letters.forEach(g => {
+                const groupLabel = `Group ${g}`;
+                const mList = appState.matches.filter(m => m["Stage"] === groupLabel);
+                const table = {};
+
+                mList.forEach(m => {
+                    const teams = m["Match"].split(' vs ');
+                    teams.forEach(t => { if(!table[t]) table[t] = { name: t, p:0, gd:0, gf:0 } });
+
+                    const rh = m["Real Score Home"], ra = m["Real Score Away"];
+                    if (rh !== "" && ra !== "" && rh !== null && ra !== null) {
+                        const h = parseInt(rh), a = parseInt(ra);
+                        table[teams[0]].gf += h; table[teams[1]].gf += a;
+                        table[teams[0]].gd += (h - a); table[teams[1]].gd += (a - h);
+                        if (h > a) table[teams[0]].p += 3;
+                        else if (a > h) table[teams[1]].p += 3;
+                        else { table[teams[0]].p += 1; table[teams[1]].p += 1; }
+                    }
+                });
+
+                const sortedTeams = Object.values(table).sort((a,b) => b.p - a.p || b.gd - a.gd || b.gf - a.gf);
+                if (sortedTeams.length === 0) return;
+
+                let rowsHtml = "";
+                sortedTeams.forEach((t, i) => {
+                    rowsHtml += `
+                        <div class="grid grid-cols-12 p-2 text-xs font-medium border-b border-slate-50 items-center">
+                            <span class="col-span-1 text-slate-400 font-bold text-center">${i+1}</span>
+                            <span class="col-span-6 font-bold text-slate-700 truncate">${t.name}</span>
+                            <span class="col-span-1 text-center font-bold">${t.gf}</span>
+                            <span class="col-span-2 text-center font-bold text-slate-500">${t.gd > 0 ? '+'+t.gd : t.gd}</span>
+                            <span class="col-span-2 text-right font-black text-slate-900 pr-2">${t.p} pts</span>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-xs border border-slate-100 overflow-hidden">
+                        <div class="bg-slate-800 text-white font-black px-4 py-2 text-xs uppercase tracking-wider">${groupLabel}</div>
+                        <div class="grid grid-cols-12 p-2 bg-slate-50 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                            <span class="col-span-1 text-center">#</span>
+                            <span class="col-span-6">Team</span>
+                            <span class="col-span-1 text-center">GF</span>
+                            <span class="col-span-2 text-center">GD</span>
+                            <span class="col-span-2 text-right pr-2">Pts</span>
+                        </div>
+                        <div class="divide-y divide-slate-100">${rowsHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderKnockoutTree() {
+            const container = document.getElementById('knockoutContainer');
+            container.innerHTML = "";
+            const stages = ["Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Third Place Play-off", "Final"];
+
+            stages.forEach(st => {
+                const legs = appState.matches.filter(m => m["Stage"] === st);
+                if(legs.length === 0) return;
+
+                let cardsHtml = "";
+                legs.forEach(m => {
+                    const localTime = new Date(m["Match Datetime (MTY)"]);
+                    const isLocked = new Date() > localTime;
+                    const pH = m[`${appState.currentParticipant} Home`] ?? "";
+                    const pA = m[`${appState.currentParticipant} Away`] ?? "";
+                    const rH = m["Real Score Home"] ?? "";
+                    const rA = m["Real Score Away"] ?? "";
+
+                    cardsHtml += `
+                        <div onclick="${isLocked ? '' : `openModal('${m["ID"]}')`}" 
+                             class="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-between shadow-xs transition ${isLocked ? 'opacity-75 bg-slate-50' : 'hover:border-blue-300 cursor-pointer'}">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase flex justify-between">
+                                <span>${m["ID"]}</span>
+                                <span>${localTime.toLocaleDateString([], {month:'short', day:'numeric'})} ${localTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div class="my-2 space-y-1">
+                                <div class="flex justify-between text-xs font-bold text-slate-700">
+                                    <span class="truncate max-w-[140px]">${m["Match"].split(' vs ')[0]}</span>
+                                    <span class="text-slate-900 font-black">${rH !== "" ? rH : '-'}</span>
+                                </div>
+                                <div class="flex justify-between text-xs font-bold text-slate-700">
+                                    <span class="truncate max-w-[140px]">${m["Match"].split(' vs ')[1]}</span>
+                                    <span class="text-slate-900 font-black">${rA !== "" ? rA : '-'}</span>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-50 pt-1.5 flex justify-between text-[10px] items-center">
+                                <span class="text-slate-400 uppercase font-bold tracking-wider">Bet:</span>
+                                <span class="font-black text-blue-600">${pH !== "" ? `${pH} - ${pA}` : 'Empty'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest border-l-4 border-blue-600 pl-2 mb-3">${st}</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">${cardsHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function openModal(matchId) {
+            activeMatchId = matchId;
+            const match = appState.matches.find(m => m["ID"] === matchId);
+            const localTime = new Date(match["Match Datetime (MTY)"]);
+
+            document.getElementById('modalStage').textContent = match["Stage"];
+            document.getElementById('modalTeamHome').textContent = match["Match"].split(' vs ')[0];
+            document.getElementById('modalTeamAway').textContent = match["Match"].split(' vs ')[1];
+            document.getElementById('modalTimeNotice').textContent = `Local Time: ${localTime.toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
+            
+            document.getElementById('inputHome').value = match[`${appState.currentParticipant} Home`] ?? "";
+            document.getElementById('inputAway').value = match[`${appState.currentParticipant} Away`] ?? "";
+
+            document.getElementById('predictionModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('predictionModal').classList.add('hidden');
+            activeMatchId = null;
+        }
+
+        async function savePrediction() {
+            const hVal = document.getElementById('inputHome').value;
+            const aVal = document.getElementById('inputAway').value;
+
+            if (hVal === "" || aVal === "") {
+                alert("Please enter values for both home and away team fields.");
+                return;
+            }
+
+            const btn = document.getElementById('btnSavePrediction');
+            btn.disabled = true;
+            btn.textContent = "Saving...";
+
+            const payload = {
+                matchId: activeMatchId,
+                participant: appState.currentParticipant,
+                homeScore: parseInt(hVal),
+                awayScore: parseInt(aVal)
+            };
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Optimistically updating local state client engine 
+                const matchIndex = appState.matches.findIndex(m => m["ID"] === activeMatchId);
+                appState.matches[matchIndex][`${appState.currentParticipant} Home`] = payload.homeScore;
+                appState.matches[matchIndex][`${appState.currentParticipant} Away`] = payload.awayScore;
+
+                closeModal();
+                renderAllViews();
+            } catch (err) {
+                console.error(err);
+                alert("Connection dropped. Your prediction wasn't saved.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "OK";
+            }
+        }
+
+        // Initialize App on Document Load Configuration Hook
+        window.onload = init;
+    </script>
+</body>
+</html>
