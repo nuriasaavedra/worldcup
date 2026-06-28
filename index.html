@@ -156,11 +156,19 @@
                 </div>
 
                 <div id="penaltySection" class="hidden mt-4 pt-4 border-t border-slate-800">
-                    <p class="text-[9px] font-black uppercase text-slate-500 mb-3">Who wins the penalties?</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button id="btnPenHome" onclick="selectPenaltyWinner('Home')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer">Home Wins</button>
-                        <button id="btnPenAway" onclick="selectPenaltyWinner('Away')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer">Away Wins</button>
-                    </div>
+                   <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Penalty Winner</p>
+        <div class="grid grid-cols-2 gap-2">
+                <button id="btnPenaltyHome" 
+                        onclick="selectPenaltyWinner(document.getElementById('modalTeamHome').textContent)"
+                        class="p-2 bg-slate-800 hover:bg-blue-600 rounded text-white text-xs font-bold transition">
+                    Home Team
+                </button>
+                <button id="btnPenaltyAway" 
+                        onclick="selectPenaltyWinner(document.getElementById('modalTeamAway').textContent)"
+                        class="p-2 bg-slate-800 hover:bg-blue-600 rounded text-white text-xs font-bold transition">
+                    Away Team
+                </button>
+            </div>
                 </div>
 
                 <p id="modalTimeNotice" class="text-slate-500 text-[11px] font-medium tracking-wide">Time localization context mapping</p>
@@ -349,36 +357,39 @@
         let selectedPenaltyWinner = null;
 
         function updatePenaltyVisibility() {
-            const h = document.getElementById('inputHome').value;
-            const a = document.getElementById('inputAway').value;
+            const hInput = document.getElementById('inputHome');
+            const aInput = document.getElementById('inputAway');
             const penaltySection = document.getElementById('penaltySection');
             
-            if (h !== "" && a !== "" && parseInt(h) === parseInt(a)) {
+            // Only show if it's a knockout stage AND scores are equal
+            const match = appState.matches.find(m => m["ID"] === activeMatchId);
+            const isKnockout = match && ["Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Third Place Play-off", "Final"].includes(match["Stage"]);
+        
+            const valH = parseInt(hInput.value);
+            const valA = parseInt(aInput.value);
+        
+            if (isKnockout && hInput.value !== "" && aInput.value !== "" && valH === valA) {
                 penaltySection.classList.remove('hidden');
             } else {
                 penaltySection.classList.add('hidden');
-                resetPenaltySelection(); 
+                selectedPenaltyWinner = ""; // Reset if they change score away from draw
             }
         }
 
-        function selectPenaltyWinner(team) {
-            selectedPenaltyWinner = team;
+        function selectPenaltyWinner(teamName) {
+            selectedPenaltyWinner = teamName;
+            const hBtn = document.getElementById('btnPenaltyHome');
+            const aBtn = document.getElementById('btnPenaltyAway');
             
             // Highlight the selected button and unhighlight the other
-            const btnHome = document.getElementById('btnPenHome');
-            const btnAway = document.getElementById('btnPenAway');
-            
-            btnHome.classList.toggle('bg-blue-600', team === 'Home');
-            btnHome.classList.toggle('bg-slate-800', team !== 'Home'); // Ensure default styling
-            
-            btnAway.classList.toggle('bg-blue-600', team === 'Away');
-            btnAway.classList.toggle('bg-slate-800', team !== 'Away'); // Ensure default styling
+            hBtn.classList.toggle('bg-blue-600', teamName === hBtn.textContent);
+            aBtn.classList.toggle('bg-blue-600', teamName === aBtn.textContent);
         }
 
         function resetPenaltySelection() {
             selectedPenaltyWinner = null;
-            document.getElementById('btnPenHome').className = "py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer";
-            document.getElementById('btnPenAway').className = "py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer";
+            document.getElementById('btnPenaltyHome').className = "py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer";
+            document.getElementById('btnPenaltyAway').className = "py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer";
         }
 
         function calculateLeaderboard() {
@@ -618,7 +629,15 @@
             document.getElementById('modalTimeNotice').textContent = `Kickoff: ${localTime.toLocaleString([], {weekday: 'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName: 'short'})}`;
             document.getElementById('inputHome').value = match[`${appState.currentParticipant} Home`] ?? "";
             document.getElementById('inputAway').value = match[`${appState.currentParticipant} Away`] ?? "";
+
+            document.getElementById('btnPenaltyHome').textContent = tHome;
+        	document.getElementById('btnPenaltyAway').textContent = tAway;
+            
+            selectedPenaltyWinner = "";
+            
             document.getElementById('predictionModal').classList.remove('hidden');
+
+            updatePenaltyVisibility();
         }
 
         function updateTournamentStats() {
