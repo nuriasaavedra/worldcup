@@ -612,23 +612,17 @@
             const hBtn = document.getElementById('btnPenaltyHome');
             const aBtn = document.getElementById('btnPenaltyAway');
 
+            if (!hBtn || !aBtn) return;
+            
             const hText = hBtn.textContent.trim();
             const aText = aBtn.textContent.trim();
             const cleanWinner = (winnerName || "").trim();
-                    console.log("--- DEBUGGING UI ---");
+            
+            console.log("--- DEBUGGING UI ---");
             console.log("Winner from data:", `"${cleanWinner}"`);
             console.log("Home Button Text:", `"${hText}"`);
             console.log("Away Button Text:", `"${aText}"`);
             console.log("Match Found:", cleanWinner === hText ? "Home" : (cleanWinner === aText ? "Away" : "None"));
-
-            if (!hBtn || !aBtn) return;
-            
-            // Remove highlighting from both
-            hBtn.classList.remove('bg-blue-600');
-            aBtn.classList.remove('bg-blue-600');
-        
-            // Add highlighting only to the winner
-            const cleanWinner = (winnerName || "").trim();
 
             const toggleButton = (btn, isSelected) => {
             if (isSelected) {
