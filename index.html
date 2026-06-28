@@ -378,12 +378,7 @@
 
         function selectPenaltyWinner(teamName) {
             selectedPenaltyWinner = teamName;
-            const hBtn = document.getElementById('btnPenaltyHome');
-            const aBtn = document.getElementById('btnPenaltyAway');
-            
-            // Highlight the selected button and unhighlight the other
-            hBtn.classList.toggle('bg-blue-600', teamName === hBtn.textContent);
-            aBtn.classList.toggle('bg-blue-600', teamName === aBtn.textContent);
+            applyPenaltyUI(teamName); // Calls the helper to draw the UI
         }
 
         function resetPenaltySelection() {
@@ -613,6 +608,22 @@
             });
         }
 
+        function applyPenaltyUI(winnerName) {
+            const hBtn = document.getElementById('btnPenaltyHome');
+            const aBtn = document.getElementById('btnPenaltyAway');
+        
+            // Remove highlighting from both
+            hBtn.classList.remove('bg-blue-600');
+            aBtn.classList.remove('bg-blue-600');
+        
+            // Add highlighting only to the winner
+            if (winnerName === hBtn.textContent) {
+                hBtn.classList.add('bg-blue-600');
+            } else if (winnerName === aBtn.textContent) {
+                aBtn.classList.add('bg-blue-600');
+            }
+        }
+
         function openModal(matchId) {
             activeMatchId = matchId;
             const match = appState.matches.find(m => m["ID"] === matchId);
@@ -636,26 +647,12 @@
             // 1. Get the existing value from your data
             const penaltyKey = `${appState.currentParticipant} Penalties`;
             const savedWinner = match[penaltyKey]; 
-            
-            // Now proceed with your existing logic for setting the UI:
-            if (savedWinner) {
-                selectedPenaltyWinner = savedWinner;
-                
-                // Apply highlight
-                if (savedWinner === tHome) {
-                    document.getElementById('btnPenaltyHome').classList.add('bg-blue-600');
-                    document.getElementById('btnPenaltyAway').classList.remove('bg-blue-600');
-                } else if (savedWinner === tAway) {
-                    document.getElementById('btnPenaltyAway').classList.add('bg-blue-600');
-                    document.getElementById('btnPenaltyHome').classList.remove('bg-blue-600');
-                }
-            } else {
-                // Reset if no saved selection
-                selectedPenaltyWinner = "";
-                document.getElementById('btnPenaltyHome').classList.remove('bg-blue-600');
-                document.getElementById('btnPenaltyAway').classList.remove('bg-blue-600');
-            }
-            
+
+            selectedPenaltyWinner = savedWinner || ""; 
+        
+            // 3. Update the UI based on that variable
+            applyPenaltyUI(selectedPenaltyWinner);
+        
             document.getElementById('predictionModal').classList.remove('hidden');
 
             updatePenaltyVisibility();
