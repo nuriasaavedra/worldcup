@@ -629,11 +629,20 @@
         
             // Add highlighting only to the winner
             const cleanWinner = (winnerName || "").trim();
-            if (cleanWinner === hBtn.textContent.trim()) {
-                hBtn.classList.add('bg-blue-600');
-            } else if (cleanWinner === aBtn.textContent.trim()) {
-                aBtn.classList.add('bg-blue-600');
+
+            const toggleButton = (btn, isSelected) => {
+            if (isSelected) {
+                btn.classList.add('bg-blue-600');    // Add the active color
+                btn.classList.remove('bg-slate-800'); // Remove the inactive color
+            } else {
+                btn.classList.remove('bg-blue-600');  // Remove the active color
+                btn.classList.add('bg-slate-800');    // Add the inactive color
             }
+        };
+    
+        // Apply to both buttons
+        toggleButton(hBtn, cleanWinner === hText);
+        toggleButton(aBtn, cleanWinner === aText);
         }
 
         function openModal(matchId) {
