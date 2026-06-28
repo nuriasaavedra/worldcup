@@ -563,6 +563,8 @@
                 const legs = appState.matches.filter(m => m["Stage"] === st);
                 if(legs.length === 0) return;
                 let cardsHtml = "";
+                const penaltyKey = `${appState.currentParticipant} Penalties`; // Key for the user's data
+                
                 legs.forEach(m => {
                     const localTime = parseUtcDate(m["Match Datetime (UTC)"]);
                     if (!localTime) return false;
