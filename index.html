@@ -611,15 +611,27 @@
         function applyPenaltyUI(winnerName) {
             const hBtn = document.getElementById('btnPenaltyHome');
             const aBtn = document.getElementById('btnPenaltyAway');
-        
+
+            const hText = hBtn.textContent.trim();
+            const aText = aBtn.textContent.trim();
+            const cleanWinner = (winnerName || "").trim();
+                    console.log("--- DEBUGGING UI ---");
+            console.log("Winner from data:", `"${cleanWinner}"`);
+            console.log("Home Button Text:", `"${hText}"`);
+            console.log("Away Button Text:", `"${aText}"`);
+            console.log("Match Found:", cleanWinner === hText ? "Home" : (cleanWinner === aText ? "Away" : "None"));
+
+            if (!hBtn || !aBtn) return;
+            
             // Remove highlighting from both
             hBtn.classList.remove('bg-blue-600');
             aBtn.classList.remove('bg-blue-600');
         
             // Add highlighting only to the winner
-            if (winnerName === hBtn.textContent) {
+            const cleanWinner = (winnerName || "").trim();
+            if (cleanWinner === hBtn.textContent.trim()) {
                 hBtn.classList.add('bg-blue-600');
-            } else if (winnerName === aBtn.textContent) {
+            } else if (cleanWinner === aBtn.textContent.trim()) {
                 aBtn.classList.add('bg-blue-600');
             }
         }
