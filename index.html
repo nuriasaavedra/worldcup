@@ -633,7 +633,28 @@
             document.getElementById('btnPenaltyHome').textContent = tHome;
         	document.getElementById('btnPenaltyAway').textContent = tAway;
             
-            selectedPenaltyWinner = "";
+            // 1. Get the existing value from your data
+            const penaltyKey = `${appState.currentParticipant} Penalties`;
+            const savedWinner = match[penaltyKey]; 
+            
+            // Now proceed with your existing logic for setting the UI:
+            if (savedWinner) {
+                selectedPenaltyWinner = savedWinner;
+                
+                // Apply highlight
+                if (savedWinner === tHome) {
+                    document.getElementById('btnPenaltyHome').classList.add('bg-blue-600');
+                    document.getElementById('btnPenaltyAway').classList.remove('bg-blue-600');
+                } else if (savedWinner === tAway) {
+                    document.getElementById('btnPenaltyAway').classList.add('bg-blue-600');
+                    document.getElementById('btnPenaltyHome').classList.remove('bg-blue-600');
+                }
+            } else {
+                // Reset if no saved selection
+                selectedPenaltyWinner = "";
+                document.getElementById('btnPenaltyHome').classList.remove('bg-blue-600');
+                document.getElementById('btnPenaltyAway').classList.remove('bg-blue-600');
+            }
             
             document.getElementById('predictionModal').classList.remove('hidden');
 
