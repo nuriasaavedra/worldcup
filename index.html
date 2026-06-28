@@ -41,9 +41,9 @@
 
         <div class="max-w-5xl mx-auto px-4 overflow-x-auto flex text-xs font-bold tracking-wider uppercase text-slate-400">
             <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="active-tab px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">🏠 Leaderboard</button>
+            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">🌳 Brackets</button>
             <button onclick="switchTab('group-tables')" id="tab-group-tables" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">📊 Standings</button>
             <button onclick="switchTab('group-matches')" id="tab-group-matches" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">📅 Matches</button>
-            <button onclick="switchTab('knockout')" id="tab-knockout" class="px-5 py-3.5 border-b-2 border-transparent whitespace-nowrap cursor-pointer transition-all">🌳 Brackets</button>
         </div>
     </nav>
 
@@ -68,7 +68,10 @@
             
                 <div class="relative z-10 border-t border-slate-800 pt-6">
                     <h2 class="text-xl font-black uppercase text-white tracking-wide">Live Standings</h2>
-                    <p class="text-slate-400 text-xs mt-1">Metrics: 5pts Exact Score Match | 3pts Outcome + GD Hit | 2pts Straight Match Winner</p>
+                    <p class="text-slate-400 text-xs mt-1">
+                        Metrics: 5pts Exact Score | 3pts Outcome + GD Hit | 2pts Straight Winner | 
+                        <span class="text-blue-400 font-bold">+2pts Penalty Winner (Knockout)</span>
+                    </p>
                 </div>
                 
                 <div class="absolute -right-4 -bottom-10 opacity-5 font-black text-[12rem] pointer-events-none">#1</div>
@@ -149,6 +152,14 @@
                     <div class="w-5/12 text-center space-y-1">
                         <span id="modalAwayFlag" class="text-2xl block"></span>
                         <p id="modalTeamAway" class="font-black text-white text-sm tracking-wide line-clamp-2"></p>
+                    </div>
+                </div>
+
+                <div id="penaltySection" class="hidden mt-4 pt-4 border-t border-slate-800">
+                    <p class="text-[9px] font-black uppercase text-slate-500 mb-3">Who wins the penalties?</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btnPenHome" onclick="selectPenaltyWinner('Home')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer">Home Wins</button>
+                        <button id="btnPenAway" onclick="selectPenaltyWinner('Away')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold text-white hover:bg-blue-600 transition cursor-pointer">Away Wins</button>
                     </div>
                 </div>
 
@@ -307,26 +318,59 @@
             renderKnockoutTree();
         }
 
-        function computePoints(realH, realA, predH, predA) {
+        function computePoints(realH, realA, predH, predA, realWinner, predWinner) {
+            // 1. Validate inputs
             if ([realH, realA, predH, predA].some(x => x === "" || x === null || x === undefined)) return 0;
+            
             const rh = parseInt(realH), ra = parseInt(realA);
             const ph = parseInt(predH), pa = parseInt(predA);
-            if (rh === ph && ra === pa) return 5;
-            if (Math.sign(rh - ra) === Math.sign(ph - pa)) {
-                if ((rh - ra) === (ph - pa)) return 3;
-                return 2;
+            
+            let points = 0;
+        
+            // 2. Existing Scoring Logic
+            if (rh === ph && ra === pa) {
+                points = 5;
+            } else if (Math.sign(rh - ra) === Math.sign(ph - pa)) {
+                points = ((rh - ra) === (ph - pa)) ? 3 : 2;
             }
-            return 0;
+        
+            // 3. Penalty Bonus Logic (Only if it's a draw and someone predicted a draw)
+            if (rh === ra && ph === pa) {
+                // If the match had a penalty result (realWinner exists) 
+                // AND the user picked a winner (predWinner exists)
+                if (realWinner && predWinner && realWinner === predWinner) {
+                    points += 2; 
+                }
+            }
+        
+            return points;
+        }
+
+        let selectedPenaltyWinner = null;
+
+        function selectPenaltyWinner(team) {
+            selectedPenaltyWinner = team;
+            
+            // Highlight the selected button and unhighlight the other
+            const btnHome = document.getElementById('btnPenHome');
+            const btnAway = document.getElementById('btnPenAway');
+            
+            btnHome.classList.toggle('bg-blue-600', team === 'Home');
+            btnHome.classList.toggle('bg-slate-800', team !== 'Home'); // Ensure default styling
+            
+            btnAway.classList.toggle('bg-blue-600', team === 'Away');
+            btnAway.classList.toggle('bg-slate-800', team !== 'Away'); // Ensure default styling
         }
 
         function calculateLeaderboard() {
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };        
             updateTournamentStats();
             appState.matches.forEach(m => {
-                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"]);
-                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"]);
-                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"]);
-                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"]);
+                // We pass the "Real Winner" (Column P) and the specific user's winner (Columns Q-T)
+                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"], m["Real Winner"], m["Nunu Winner"]);
+                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"], m["Real Winner"], m["Charlie Winner"]);
+                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"], m["Real Winner"], m["Paddy Winner"]);
+                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"], m["Real Winner"], m["Lore Winner"]);
             });
         
             const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
@@ -611,7 +655,8 @@
                 matchId: activeMatchId,
                 participant: appState.currentParticipant,
                 homeScore: parseInt(hVal),
-                awayScore: parseInt(aVal)
+                awayScore: parseInt(aVal),
+                winner: selectedPenaltyWinner
             };
 
             try {
