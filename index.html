@@ -391,11 +391,11 @@
             const scores = { Nunu: 0, Charlie: 0, Paddy: 0, Lore: 0 };        
             updateTournamentStats();
             appState.matches.forEach(m => {
-                // We pass the "Real Winner" (Column P) and the specific user's winner (Columns Q-T)
-                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"], m["Real Winner"], m["Nunu Winner"]);
-                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"], m["Real Winner"], m["Charlie Winner"]);
-                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"], m["Real Winner"], m["Paddy Winner"]);
-                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"], m["Real Winner"], m["Lore Winner"]);
+                // Maps correctly to "Penalties Score" for reality and "[Name] Penalties" for predictions
+                scores.Nunu += computePoints(m["Real Score Home"], m["Real Score Away"], m["Nunu Home"], m["Nunu Away"], m["Penalties Score"], m["Nunu Penalties"]);
+                scores.Charlie += computePoints(m["Real Score Home"], m["Real Score Away"], m["Charlie Home"], m["Charlie Away"], m["Penalties Score"], m["Charlie Penalties"]);
+                scores.Paddy += computePoints(m["Real Score Home"], m["Real Score Away"], m["Paddy Home"], m["Paddy Away"], m["Penalties Score"], m["Paddy Penalties"]);
+                scores.Lore += computePoints(m["Real Score Home"], m["Real Score Away"], m["Lore Home"], m["Lore Away"], m["Penalties Score"], m["Lore Penalties"]);
             });
         
             const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
