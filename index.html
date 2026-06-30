@@ -346,8 +346,18 @@
             if (rh === ra && ph === pa) {
                 // If the match had a penalty result (realWinner exists) 
                 // AND the user picked a winner (predWinner exists)
-                if (realWinner && predWinner && realWinner === predWinner) {
-                    points += 2; 
+                if (realWinner && predWinner && realWinner !== "" && predWinner !== "") {
+            
+                    // The Fix: Convert to string, remove spaces on ends, make lowercase
+                    const cleanReal = String(realWinner).trim().toLowerCase();
+                    const cleanPred = String(predWinner).trim().toLowerCase();
+                    
+                    // Optional: You can check your browser console (F12) to see exactly what it's comparing
+                    // console.log(`Comparing Penalties -> Real: '${cleanReal}' vs Pred: '${cleanPred}'`);
+        
+                    if (cleanReal === cleanPred) {
+                        points += 2; // Add the 2 penalty points!
+                    }
                 }
             }
         
